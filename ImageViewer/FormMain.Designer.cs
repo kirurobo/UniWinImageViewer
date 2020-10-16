@@ -29,7 +29,7 @@
         private void InitializeComponent()
         {
             this.components = new System.ComponentModel.Container();
-            this.textBoxMessage = new System.Windows.Forms.TextBox();
+            System.ComponentModel.ComponentResourceManager resources = new System.ComponentModel.ComponentResourceManager(typeof(FormMain));
             this.pictureBoxMain = new System.Windows.Forms.PictureBox();
             this.contextMenuStripMain = new System.Windows.Forms.ContextMenuStrip(this.components);
             this.openToolStripMenuItem = new System.Windows.Forms.ToolStripMenuItem();
@@ -59,18 +59,6 @@
             this.contextMenuStripMain.SuspendLayout();
             this.SuspendLayout();
             // 
-            // textBoxMessage
-            // 
-            this.textBoxMessage.BackColor = System.Drawing.Color.Black;
-            this.textBoxMessage.Dock = System.Windows.Forms.DockStyle.Fill;
-            this.textBoxMessage.Enabled = false;
-            this.textBoxMessage.ForeColor = System.Drawing.Color.White;
-            this.textBoxMessage.Location = new System.Drawing.Point(0, 0);
-            this.textBoxMessage.Multiline = true;
-            this.textBoxMessage.Name = "textBoxMessage";
-            this.textBoxMessage.Size = new System.Drawing.Size(384, 361);
-            this.textBoxMessage.TabIndex = 1;
-            // 
             // pictureBoxMain
             // 
             this.pictureBoxMain.BackColor = System.Drawing.Color.Black;
@@ -99,7 +87,7 @@
             this.toolStripSeparator2,
             this.exitToolStripMenuItem});
             this.contextMenuStripMain.Name = "contextMenuStripMain";
-            this.contextMenuStripMain.Size = new System.Drawing.Size(188, 170);
+            this.contextMenuStripMain.Size = new System.Drawing.Size(188, 192);
             // 
             // openToolStripMenuItem
             // 
@@ -206,6 +194,7 @@
             this.enableSllideShowToolStripMenuItem.Name = "enableSllideShowToolStripMenuItem";
             this.enableSllideShowToolStripMenuItem.Size = new System.Drawing.Size(181, 22);
             this.enableSllideShowToolStripMenuItem.Text = "一定時間で切替 (&0)";
+            this.enableSllideShowToolStripMenuItem.Click += new System.EventHandler(this.enableSllideShowToolStripMenuItem_Click);
             // 
             // intervalTimeTtoolStripComboBox
             // 
@@ -216,6 +205,7 @@
             "60 秒"});
             this.intervalTimeTtoolStripComboBox.Name = "intervalTimeTtoolStripComboBox";
             this.intervalTimeTtoolStripComboBox.Size = new System.Drawing.Size(121, 23);
+            this.intervalTimeTtoolStripComboBox.TextChanged += new System.EventHandler(this.intervalTimeTtoolStripComboBox_TextChanged);
             // 
             // intervalRandomizeToolStripMenuItem
             // 
@@ -279,8 +269,8 @@
             this.ClientSize = new System.Drawing.Size(384, 361);
             this.ContextMenuStrip = this.contextMenuStripMain;
             this.Controls.Add(this.pictureBoxMain);
-            this.Controls.Add(this.textBoxMessage);
             this.ForeColor = System.Drawing.Color.Black;
+            this.Icon = ((System.Drawing.Icon)(resources.GetObject("$this.Icon")));
             this.Name = "FormMain";
             this.Text = "Image Viewer";
             this.Activated += new System.EventHandler(this.FormMain_Activated);
@@ -288,17 +278,16 @@
             this.Shown += new System.EventHandler(this.Form1_Shown);
             this.DragDrop += new System.Windows.Forms.DragEventHandler(this.FormMain_DragDrop);
             this.DragEnter += new System.Windows.Forms.DragEventHandler(this.FormMain_DragEnter);
+            this.KeyDown += new System.Windows.Forms.KeyEventHandler(this.FormMain_KeyDown);
             this.KeyUp += new System.Windows.Forms.KeyEventHandler(this.FormMain_KeyUp);
             this.Resize += new System.EventHandler(this.FormMain_Resize);
             ((System.ComponentModel.ISupportInitialize)(this.pictureBoxMain)).EndInit();
             this.contextMenuStripMain.ResumeLayout(false);
             this.ResumeLayout(false);
-            this.PerformLayout();
 
         }
 
         #endregion
-        private System.Windows.Forms.TextBox textBoxMessage;
         private System.Windows.Forms.PictureBox pictureBoxMain;
         private System.Windows.Forms.ContextMenuStrip contextMenuStripMain;
         private System.Windows.Forms.ToolStripMenuItem openToolStripMenuItem;

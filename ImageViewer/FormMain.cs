@@ -13,6 +13,13 @@ using System.Windows.Forms;
 
 namespace UniWinImageViewer
 {
+    /// <summary>
+    /// 画像ビューア
+    /// 
+    /// アイコンは ICON HOIHOI 様のものを利用
+    /// http://iconhoihoi.oops.jp/item/2010/12/85-map-OTHER.html
+    /// </summary>
+
     public partial class FormMain : Form
     {
         /// <summary>
@@ -41,7 +48,7 @@ namespace UniWinImageViewer
         // 開くファイルのリスト
         List<string> m_targetFiles = new List<string>();
 
-        string[] m_targetFileTypes = {
+        string[] m_targetExtensions = {
             ".jpg", ".jpeg", ".png", ".gif"
         };
 
@@ -58,9 +65,16 @@ namespace UniWinImageViewer
         /// </summary>
         float m_fitScale = 0.0f;
 
-        bool m_isDragging = false;
-        Point m_dragStartedCursorLocation;
+        /// <summary>
+        /// スライドショー間隔 [s]
+        /// </summary>
+        float m_slideShowInterval = 0.0f;
+        Stopwatch m_stopwatch = new Stopwatch();
+        long m_nextImageTime = 0;   // 次の画像に移る時刻
 
+        bool m_isDragging = false;
+        bool m_isOpaque = false;    // [Shift]を押している間trueになり、一時的に透過を抑制する
+        Point m_dragStartedCursorLocation;
         byte m_alphaThreshold = 0x19;
 
         Bitmap currentBitmap
@@ -68,12 +82,13 @@ namespace UniWinImageViewer
             get { return m_bitmaps[m_bitmapIndex];  }
         }
 
-
         public FormMain()
         {
             InitializeComponent();
 
             m_settings.Load(SettingsPath);
+
+            m_stopwatch.Start();
         }
 
         void ForwardImage(int step)
@@ -121,7 +136,7 @@ namespace UniWinImageViewer
                             if (File.Exists(path))
                             {
                                 var ext = Path.GetExtension(path).ToLower();
-                                if (m_targetFiles.Contains(ext))
+                                if (m_targetExtensions.Contains(ext))
                                 {
                                     m_targetFiles.Add(path);
                                 }
@@ -130,7 +145,10 @@ namespace UniWinImageViewer
                     }
                     else if (File.Exists(file))
                     {
-                        m_targetFiles.Add(file);
+                        var ext = Path.GetExtension(file).ToLower();
+                        if (m_targetExtensions.Contains(ext)) {
+                            m_targetFiles.Add(file);
+                        }
                     }
                 }
 
@@ -152,6 +170,7 @@ namespace UniWinImageViewer
             Console.WriteLine("Loading " + path);
 
             int backIndex = m_bitmapIndex > 0 ? 0 : 1;
+            int foreIndex = m_bitmapIndex;
 
             Bitmap bitmap = null;
             try
@@ -172,7 +191,15 @@ namespace UniWinImageViewer
 
             m_bitmaps[backIndex] = bitmap;
             m_bitmapIndex = backIndex;
+            
             pictureBoxMain.Image = currentBitmap;
+
+            // 前の画像リソースはクリア
+            if (m_bitmaps[foreIndex] != null)
+            {
+                m_bitmaps[foreIndex].Dispose();
+                m_bitmaps[foreIndex] = null;
+            }
 
             // ウィンドウサイズ調整
             FitWindowSize();
@@ -198,6 +225,23 @@ namespace UniWinImageViewer
 
         }
 
+        /// <summary>
+        /// 経過時間をみてスライドショーを更新
+        /// </summary>
+        void UpdateSlideShow()
+        {
+            long now = m_stopwatch.ElapsedMilliseconds;
+
+            if (m_slideShowInterval > 0 && m_nextImageTime <= now)
+            {
+                ForwardImage(1);
+                m_nextImageTime = now + (int)(m_slideShowInterval * 1000);
+            }
+        }
+
+        /// <summary>
+        /// コンテキストメニューの表示を更新
+        /// </summary>
         void UpdateUI()
         {
             // ウィンドウ状態
@@ -210,6 +254,20 @@ namespace UniWinImageViewer
             windowFitsHalfImageToolStripMenuItem.Checked = (m_fitScale == 0.5f);
             windowFitsTwiceImageToolStripMenuItem.Checked = (m_fitScale == 2.0f);
 
+            // スライドショー間隔
+            if (m_slideShowInterval > 0)
+            {
+                enableSllideShowToolStripMenuItem.Checked = true;
+                intervalTimeTtoolStripComboBox.Enabled = true;
+                intervalTimeTtoolStripComboBox.Text = m_slideShowInterval.ToString("0.0") + " 秒";
+            }
+            else
+            {
+                enableSllideShowToolStripMenuItem.Checked = false;
+                intervalTimeTtoolStripComboBox.Enabled = false;
+                intervalTimeTtoolStripComboBox.Text = "";
+            }
+
         }
 
         /// <summary>
@@ -217,13 +275,32 @@ namespace UniWinImageViewer
         /// </summary>
         void UpdateClickThrough()
         {
+            bool through = false;
+
+            if ((Control.ModifierKeys & Keys.Shift) == Keys.Shift)
+            {
+                // [Shift] が押されている間、透過は抑制
+                if (m_uniwin.IsTransparent)
+                {
+                    m_uniwin.EnableTransparent(false);
+                }
+                if (m_uniwin.IsClickThrough)
+                {
+                    m_uniwin.EnableClickThrough(false);
+                }
+                return;
+            }
+
+            // [Shift] が押されている間、透過は抑制
+            if (invisibleToolStripMenuItem.Checked && !m_uniwin.IsTransparent)
+            {
+                m_uniwin.EnableTransparent(true);
+            }
+
             if (m_uniwin.IsTransparent && !m_isDragging)
             {
                 Point curPos = Cursor.Position;
                 Point location = pictureBoxMain.PointToClient(curPos);
-
-                // SizeMode.Zoom 専用
-                bool through;
 
                 int pw = pictureBoxMain.Width;
                 int ph = pictureBoxMain.Height;
@@ -235,6 +312,8 @@ namespace UniWinImageViewer
                 }
                 else
                 {
+                    // SizeMode.Zoom 専用で、画像のマウスカーソル座標を画像座標に換算
+
                     int iw = currentBitmap.Width;
                     int ih = currentBitmap.Height;
 
@@ -247,13 +326,13 @@ namespace UniWinImageViewer
                     {
                         // 画像の横幅が長い場合、Xは目いっぱい
                         x = location.X * iw / pw;
-                        y = ((location.Y - ph / 2) * iw / pw) + iw / 2;
+                        y = ((location.Y - ph / 2) * iw / pw) + ih / 2;     // y なのに * iw / pw となっていることに注意。Zoomなのでこうする。
                     }
                     else
                     {
                         // 画像の高さが高い場合、Yは目いっぱい
-                        x = ((location.X - pw / 2) * iw / pw) + iw / 2;
-                        y = location.Y * iw / ph;
+                        x = ((location.X - pw / 2) * ih / ph) + iw / 2;     // x なのに * ih / ph となっていることに注意。Zoomなのでこうする。
+                        y = location.Y * ih / ph;
                     }
 
 
@@ -268,10 +347,48 @@ namespace UniWinImageViewer
                         through = (color.A < m_alphaThreshold);
                     }
                 }
+
+            }
+
+            // さっきまでと異なっていれば適用
+            if (m_uniwin.IsClickThrough != through)
+            {
                 m_uniwin.EnableClickThrough(through);
             }
         }
 
+        void UpdateSlideShowInterval()
+        {
+            float interval = 0;
+
+            if (enableSllideShowToolStripMenuItem.Checked)
+            {
+                if (!float.TryParse(intervalTimeTtoolStripComboBox.Text, out interval))
+                {
+                    intervalTimeTtoolStripComboBox.Text = "";
+                }
+            }
+            else
+            {
+                //if (intervalTimeTtoolStripComboBox)
+            }
+
+            //  負の時間はなし
+            if (interval <= 0) interval = 0;
+
+            // スライドショー開始
+            if (interval > 0)
+            {
+                m_slideShowInterval = interval;
+                m_nextImageTime = m_stopwatch.ElapsedMilliseconds + (int)(interval * 1000);
+            }
+            else
+            {
+                m_slideShowInterval = 0;
+
+            }
+
+        }
 
         #region 設定保存関連
 
@@ -282,6 +399,8 @@ namespace UniWinImageViewer
         {
             m_uniwin.EnableTransparent(m_settings.IsTransparent);    // 透過状態
             m_uniwin.EnableTopmost(m_settings.IsTompost);            // 最前面
+
+            m_fitScale = m_settings.WindowFitScale;
         }
 
         /// <summary>
@@ -291,6 +410,7 @@ namespace UniWinImageViewer
         {
             m_settings.IsTransparent = m_uniwin.IsTransparent;
             m_settings.IsTompost= m_uniwin.IsTopmost;
+            m_settings.WindowFitScale = m_fitScale;
 
             m_settings.Save(SettingsPath);
         }
@@ -324,7 +444,7 @@ namespace UniWinImageViewer
         private void checkBoxTransparent_CheckedChanged(object sender, EventArgs e)
         {
             invisibleToolStripMenuItem.Checked = !invisibleToolStripMenuItem.Checked;
-            m_uniwin.EnableTransparent(invisibleToolStripMenuItem.Checked);
+            m_uniwin.EnableTransparent(invisibleToolStripMenuItem.Checked && !m_isOpaque);
         }
 
         private void checkBoxTopmost_CheckedChanged(object sender, EventArgs e)
@@ -364,10 +484,11 @@ namespace UniWinImageViewer
 
         private void openToolStripMenuItem_Click(object sender, EventArgs e)
         {
-            if (openFileDialogImage.ShowDialog(this) == DialogResult.OK) {
+            if (openFileDialogImage.ShowDialog() == DialogResult.OK) {
                 string[] files = openFileDialogImage.FileNames;
                 OpenFiles(files);
             }
+            openFileDialogImage.Dispose();
         }
 
         private void exitToolStripMenuItem_Click(object sender, EventArgs e)
@@ -411,6 +532,14 @@ namespace UniWinImageViewer
             }
         }
 
+        private void FormMain_KeyDown(object sender, KeyEventArgs e)
+        {
+            //if (e.KeyCode == Keys.ShiftKey)
+            //{
+            //    m_isOpaque = true;
+            //    m_uniwin.EnableTransparent(false);
+            //}
+        }
         private void FormMain_KeyUp(object sender, KeyEventArgs e)
         {
             if (e.Modifiers == Keys.None)
@@ -426,6 +555,12 @@ namespace UniWinImageViewer
                     e.Handled = true;
                 }
             }
+
+            //if (e.KeyCode == Keys.ShiftKey)
+            //{
+            //    m_isOpaque = false;
+            //    m_uniwin.EnableTransparent(invisibleToolStripMenuItem.Checked);
+            //}
         }
 
         private void windowNoFitToolStripMenuItem_Click(object sender, EventArgs e)
@@ -499,6 +634,17 @@ namespace UniWinImageViewer
         {
             // フォーカスが当たった直後はクリックスルーを強制解除
             if (m_uniwin != null) m_uniwin.EnableClickThrough(false);
+        }
+
+        private void enableSllideShowToolStripMenuItem_Click(object sender, EventArgs e)
+        {
+            enableSllideShowToolStripMenuItem.Checked = !enableSllideShowToolStripMenuItem.Checked;
+            UpdateSlideShowInterval();
+        }
+
+        private void intervalTimeTtoolStripComboBox_TextChanged(object sender, EventArgs e)
+        {
+            UpdateSlideShowInterval();
         }
     }
 }

@@ -24,13 +24,22 @@ namespace UniWinImageViewer
         public bool IsTompost { get; set; } = true;
 
         /// <summary>
+        /// ウィンドウサイズを画像に合わせる際の係数。0なら合わせない
+        /// </summary>
+        [DataMember]
+        public float WindowFitScale { get; set; } = 0;
+
+        /// <summary>
+        /// スライドショー間隔 [s]
+        /// </summary>
+        [DataMember]
+        public float SlideShowInterval{ get; set; } = 0;
+
+        /// <summary>
         /// 最後に開いたファイル
         /// </summary>
         [DataMember]
         public string RecentFile { get; set; } = "";
-
-        [DataMember]
-        private string FontString { get; set; } = "";
 
 
         /// 記録時のエンコーディング
@@ -72,6 +81,8 @@ namespace UniWinImageViewer
             this.IsTompost = src.IsTompost;
             this.IsTransparent = src.IsTransparent;
             this.RecentFile = src.RecentFile;
+            this.WindowFitScale = src.WindowFitScale;
+            this.SlideShowInterval = src.SlideShowInterval;
         }
 
 
