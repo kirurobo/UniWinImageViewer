@@ -1,4 +1,4 @@
-﻿namespace TestLibUniWinC
+﻿namespace UniWinImageViewer
 {
     partial class FormMain
     {
@@ -42,18 +42,18 @@
             this.windowFitsHalfImageToolStripMenuItem = new System.Windows.Forms.ToolStripMenuItem();
             this.windowFitsTwiceImageToolStripMenuItem = new System.Windows.Forms.ToolStripMenuItem();
             this.slideshowToolStripMenuItem = new System.Windows.Forms.ToolStripMenuItem();
+            this.次の画像NToolStripMenuItem = new System.Windows.Forms.ToolStripMenuItem();
+            this.前の画像PToolStripMenuItem = new System.Windows.Forms.ToolStripMenuItem();
+            this.toolStripSeparator1 = new System.Windows.Forms.ToolStripSeparator();
             this.enableSllideShowToolStripMenuItem = new System.Windows.Forms.ToolStripMenuItem();
             this.intervalTimeTtoolStripComboBox = new System.Windows.Forms.ToolStripComboBox();
+            this.intervalRandomizeToolStripMenuItem = new System.Windows.Forms.ToolStripMenuItem();
             this.motionToolStripMenuItem = new System.Windows.Forms.ToolStripMenuItem();
             this.jumpToolStripMenuItem = new System.Windows.Forms.ToolStripMenuItem();
             this.swingToolStripMenuItem = new System.Windows.Forms.ToolStripMenuItem();
             this.toolStripSeparator2 = new System.Windows.Forms.ToolStripSeparator();
             this.exitToolStripMenuItem = new System.Windows.Forms.ToolStripMenuItem();
             this.openFileDialogImage = new System.Windows.Forms.OpenFileDialog();
-            this.toolStripSeparator1 = new System.Windows.Forms.ToolStripSeparator();
-            this.intervalRandomizeToolStripMenuItem = new System.Windows.Forms.ToolStripMenuItem();
-            this.次の画像NToolStripMenuItem = new System.Windows.Forms.ToolStripMenuItem();
-            this.前の画像PToolStripMenuItem = new System.Windows.Forms.ToolStripMenuItem();
             ((System.ComponentModel.ISupportInitialize)(this.pictureBoxMain)).BeginInit();
             this.contextMenuStripMain.SuspendLayout();
             this.SuspendLayout();
@@ -145,24 +145,28 @@
             this.windowNoFitToolStripMenuItem.Name = "windowNoFitToolStripMenuItem";
             this.windowNoFitToolStripMenuItem.Size = new System.Drawing.Size(189, 22);
             this.windowNoFitToolStripMenuItem.Text = "画像へのフィットなし (&0)";
+            this.windowNoFitToolStripMenuItem.Click += new System.EventHandler(this.windowNoFitToolStripMenuItem_Click);
             // 
             // windowFitsImageToolStripMenuItem
             // 
             this.windowFitsImageToolStripMenuItem.Name = "windowFitsImageToolStripMenuItem";
             this.windowFitsImageToolStripMenuItem.Size = new System.Drawing.Size(189, 22);
             this.windowFitsImageToolStripMenuItem.Text = "画像サイズにフィット (&1)";
+            this.windowFitsImageToolStripMenuItem.Click += new System.EventHandler(this.windowFitsImageToolStripMenuItem_Click);
             // 
             // windowFitsHalfImageToolStripMenuItem
             // 
             this.windowFitsHalfImageToolStripMenuItem.Name = "windowFitsHalfImageToolStripMenuItem";
             this.windowFitsHalfImageToolStripMenuItem.Size = new System.Drawing.Size(189, 22);
             this.windowFitsHalfImageToolStripMenuItem.Text = "画像の半分にフィット (&2)";
+            this.windowFitsHalfImageToolStripMenuItem.Click += new System.EventHandler(this.windowFitsHalfImageToolStripMenuItem_Click);
             // 
             // windowFitsTwiceImageToolStripMenuItem
             // 
             this.windowFitsTwiceImageToolStripMenuItem.Name = "windowFitsTwiceImageToolStripMenuItem";
             this.windowFitsTwiceImageToolStripMenuItem.Size = new System.Drawing.Size(189, 22);
             this.windowFitsTwiceImageToolStripMenuItem.Text = "画像の倍にフィット (&3)";
+            this.windowFitsTwiceImageToolStripMenuItem.Click += new System.EventHandler(this.windowFitsTwiceImageToolStripMenuItem_Click);
             // 
             // slideshowToolStripMenuItem
             // 
@@ -176,6 +180,23 @@
             this.slideshowToolStripMenuItem.Name = "slideshowToolStripMenuItem";
             this.slideshowToolStripMenuItem.Size = new System.Drawing.Size(187, 22);
             this.slideshowToolStripMenuItem.Text = "スライドショー (&S)";
+            // 
+            // 次の画像NToolStripMenuItem
+            // 
+            this.次の画像NToolStripMenuItem.Name = "次の画像NToolStripMenuItem";
+            this.次の画像NToolStripMenuItem.Size = new System.Drawing.Size(181, 22);
+            this.次の画像NToolStripMenuItem.Text = "次の画像 (&N) ";
+            // 
+            // 前の画像PToolStripMenuItem
+            // 
+            this.前の画像PToolStripMenuItem.Name = "前の画像PToolStripMenuItem";
+            this.前の画像PToolStripMenuItem.Size = new System.Drawing.Size(181, 22);
+            this.前の画像PToolStripMenuItem.Text = "前の画像 (&P)";
+            // 
+            // toolStripSeparator1
+            // 
+            this.toolStripSeparator1.Name = "toolStripSeparator1";
+            this.toolStripSeparator1.Size = new System.Drawing.Size(178, 6);
             // 
             // enableSllideShowToolStripMenuItem
             // 
@@ -192,6 +213,13 @@
             "60 秒"});
             this.intervalTimeTtoolStripComboBox.Name = "intervalTimeTtoolStripComboBox";
             this.intervalTimeTtoolStripComboBox.Size = new System.Drawing.Size(121, 23);
+            // 
+            // intervalRandomizeToolStripMenuItem
+            // 
+            this.intervalRandomizeToolStripMenuItem.Name = "intervalRandomizeToolStripMenuItem";
+            this.intervalRandomizeToolStripMenuItem.Size = new System.Drawing.Size(181, 22);
+            this.intervalRandomizeToolStripMenuItem.Text = "時間にゆらぎ (&R)";
+            this.intervalRandomizeToolStripMenuItem.ToolTipText = "指定時間内でランダム性を与えます";
             // 
             // motionToolStripMenuItem
             // 
@@ -229,32 +257,11 @@
             // 
             // openFileDialogImage
             // 
+            this.openFileDialogImage.CheckFileExists = false;
+            this.openFileDialogImage.CheckPathExists = false;
             this.openFileDialogImage.Filter = "画像 (*.jpg,*.gif,*.png)|*.jpg;*.jpeg;*.jfif;*.gif;*.png|全てのファイル|*.*";
             this.openFileDialogImage.Multiselect = true;
-            // 
-            // toolStripSeparator1
-            // 
-            this.toolStripSeparator1.Name = "toolStripSeparator1";
-            this.toolStripSeparator1.Size = new System.Drawing.Size(178, 6);
-            // 
-            // intervalRandomizeToolStripMenuItem
-            // 
-            this.intervalRandomizeToolStripMenuItem.Name = "intervalRandomizeToolStripMenuItem";
-            this.intervalRandomizeToolStripMenuItem.Size = new System.Drawing.Size(181, 22);
-            this.intervalRandomizeToolStripMenuItem.Text = "時間にゆらぎ (&R)";
-            this.intervalRandomizeToolStripMenuItem.ToolTipText = "指定時間内でランダム性を与えます";
-            // 
-            // 次の画像NToolStripMenuItem
-            // 
-            this.次の画像NToolStripMenuItem.Name = "次の画像NToolStripMenuItem";
-            this.次の画像NToolStripMenuItem.Size = new System.Drawing.Size(181, 22);
-            this.次の画像NToolStripMenuItem.Text = "次の画像 (&N) ";
-            // 
-            // 前の画像PToolStripMenuItem
-            // 
-            this.前の画像PToolStripMenuItem.Name = "前の画像PToolStripMenuItem";
-            this.前の画像PToolStripMenuItem.Size = new System.Drawing.Size(181, 22);
-            this.前の画像PToolStripMenuItem.Text = "前の画像 (&P)";
+            this.openFileDialogImage.RestoreDirectory = true;
             // 
             // FormMain
             // 
@@ -269,6 +276,7 @@
             this.ForeColor = System.Drawing.Color.Black;
             this.Name = "FormMain";
             this.Text = "Image Viewer";
+            this.FormClosing += new System.Windows.Forms.FormClosingEventHandler(this.FormMain_FormClosing);
             this.Shown += new System.EventHandler(this.Form1_Shown);
             this.DragDrop += new System.Windows.Forms.DragEventHandler(this.FormMain_DragDrop);
             this.DragEnter += new System.Windows.Forms.DragEventHandler(this.FormMain_DragEnter);

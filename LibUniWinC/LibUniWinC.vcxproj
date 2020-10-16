@@ -107,8 +107,10 @@
       <AdditionalDependencies>dwmapi.lib;%(AdditionalDependencies)</AdditionalDependencies>
     </Link>
     <PostBuildEvent>
-      <Command>copy /B /Y "$(OutputPath)$(TargetName)$(TargetExt)" "$(SolutionDir)ImageMascot\bin\$(PlatformShortName)\$(Configuration)"</Command>
-      <Message>C#の実行ディレクトリにコピー</Message>
+      <Command>
+      </Command>
+      <Message>
+      </Message>
     </PostBuildEvent>
   </ItemDefinitionGroup>
   <ItemDefinitionGroup Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">
@@ -132,8 +134,10 @@
       <AdditionalDependencies>dwmapi.lib;%(AdditionalDependencies)</AdditionalDependencies>
     </Link>
     <PostBuildEvent>
-      <Command>copy /B /Y "$(OutputPath)$(TargetName)$(TargetExt)" "$(SolutionDir)ImageMascot\bin\$(PlatformShortName)\$(Configuration)"</Command>
-      <Message>C#の実行ディレクトリにコピー</Message>
+      <Command>
+      </Command>
+      <Message>
+      </Message>
     </PostBuildEvent>
   </ItemDefinitionGroup>
   <ItemDefinitionGroup Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">
@@ -153,8 +157,10 @@
       <AdditionalDependencies>dwmapi.lib;%(AdditionalDependencies)</AdditionalDependencies>
     </Link>
     <PostBuildEvent>
-      <Command>copy /B /Y "$(OutputPath)$(TargetName)$(TargetExt)" "$(SolutionDir)ImageMascot\bin\$(PlatformShortName)\$(Configuration)"</Command>
-      <Message>C#の実行ディレクトリにコピー</Message>
+      <Command>
+      </Command>
+      <Message>
+      </Message>
     </PostBuildEvent>
   </ItemDefinitionGroup>
   <ItemDefinitionGroup Condition="'$(Configuration)|$(Platform)'=='Release|x64'">
@@ -178,8 +184,10 @@
       <AdditionalDependencies>dwmapi.lib;%(AdditionalDependencies)</AdditionalDependencies>
     </Link>
     <PostBuildEvent>
-      <Command>copy /B /Y "$(OutputPath)$(TargetName)$(TargetExt)" "$(SolutionDir)ImageMascot\bin\$(PlatformShortName)\$(Configuration)"</Command>
-      <Message>C#の実行ディレクトリにコピー</Message>
+      <Command>
+      </Command>
+      <Message>
+      </Message>
     </PostBuildEvent>
   </ItemDefinitionGroup>
   <ItemGroup>
