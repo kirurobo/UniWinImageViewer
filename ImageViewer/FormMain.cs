@@ -61,6 +61,7 @@ namespace UniWinImageViewer
         bool m_isDragging = false;
         Point m_dragStartedCursorLocation;
 
+        byte m_alphaThreshold = 0x19;
 
         Bitmap currentBitmap
         {
@@ -211,6 +212,66 @@ namespace UniWinImageViewer
 
         }
 
+        /// <summary>
+        /// クリックスルーすべきか判断して更新
+        /// </summary>
+        void UpdateClickThrough()
+        {
+            if (m_uniwin.IsTransparent && !m_isDragging)
+            {
+                Point curPos = Cursor.Position;
+                Point location = pictureBoxMain.PointToClient(curPos);
+
+                // SizeMode.Zoom 専用
+                bool through;
+
+                int pw = pictureBoxMain.Width;
+                int ph = pictureBoxMain.Height;
+
+                if (location.X < 0 || location.Y < 0 || location.X >= pw || location.Y >= ph)
+                {
+                    // pictureBoxの範囲外ならば、クリックスルーはしない
+                    through = false;
+                }
+                else
+                {
+                    int iw = currentBitmap.Width;
+                    int ih = currentBitmap.Height;
+
+                    double imageAspect = (double)iw / (double)ih;
+                    double pictureBoxAspect = (double)pw / (double)ph;
+
+                    int x, y;
+
+                    if (imageAspect > pictureBoxAspect)
+                    {
+                        // 画像の横幅が長い場合、Xは目いっぱい
+                        x = location.X * iw / pw;
+                        y = ((location.Y - ph / 2) * iw / pw) + iw / 2;
+                    }
+                    else
+                    {
+                        // 画像の高さが高い場合、Yは目いっぱい
+                        x = ((location.X - pw / 2) * iw / pw) + iw / 2;
+                        y = location.Y * iw / ph;
+                    }
+
+
+                    if (x < 0 || y < 0 || x >= iw || y >= ih) {
+                        // 画像の範囲外ならばクリックスルー
+                        through = true;
+                    }
+                    else
+                    {
+                        // 指定ピクセルの色のアルファを基に判断
+                        var color = currentBitmap.GetPixel(x, y);
+                        through = (color.A < m_alphaThreshold);
+                    }
+                }
+                m_uniwin.EnableClickThrough(through);
+            }
+        }
+
 
         #region 設定保存関連
 
@@ -255,6 +316,9 @@ namespace UniWinImageViewer
             // デフォルト画像の読込
             string[] files = { DefaultImage };
             OpenFiles(files);
+
+            // クリックスルー判定を開始
+            timerMain.Start();
         }
 
         private void checkBoxTransparent_CheckedChanged(object sender, EventArgs e)
@@ -317,6 +381,8 @@ namespace UniWinImageViewer
             {
                 m_dragStartedCursorLocation = e.Location;
                 m_isDragging = true;
+
+                //if (m_uniwin != null) m_uniwin.EnableClickThrough(true);
             }
         }
 
@@ -406,12 +472,33 @@ namespace UniWinImageViewer
             FitWindowSize();
         }
 
-        #endregion
-
         private void FormMain_FormClosing(object sender, FormClosingEventArgs e)
         {
             // 設定を保存
             SaveSettings();
+        }
+
+        private void nextImageToolStripMenuItem_Click(object sender, EventArgs e)
+        {
+            ForwardImage(1);
+        }
+
+        private void prevImageToolStripMenuItem_Click(object sender, EventArgs e)
+        {
+            ForwardImage(-1);
+        }
+
+        private void timerMain_Tick(object sender, EventArgs e)
+        {
+            UpdateClickThrough();
+        }
+
+        #endregion
+
+        private void FormMain_Activated(object sender, EventArgs e)
+        {
+            // フォーカスが当たった直後はクリックスルーを強制解除
+            if (m_uniwin != null) m_uniwin.EnableClickThrough(false);
         }
     }
 }

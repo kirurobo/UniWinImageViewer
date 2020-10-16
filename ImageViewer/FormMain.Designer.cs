@@ -42,8 +42,8 @@
             this.windowFitsHalfImageToolStripMenuItem = new System.Windows.Forms.ToolStripMenuItem();
             this.windowFitsTwiceImageToolStripMenuItem = new System.Windows.Forms.ToolStripMenuItem();
             this.slideshowToolStripMenuItem = new System.Windows.Forms.ToolStripMenuItem();
-            this.次の画像NToolStripMenuItem = new System.Windows.Forms.ToolStripMenuItem();
-            this.前の画像PToolStripMenuItem = new System.Windows.Forms.ToolStripMenuItem();
+            this.nextImageToolStripMenuItem = new System.Windows.Forms.ToolStripMenuItem();
+            this.prevImageToolStripMenuItem = new System.Windows.Forms.ToolStripMenuItem();
             this.toolStripSeparator1 = new System.Windows.Forms.ToolStripSeparator();
             this.enableSllideShowToolStripMenuItem = new System.Windows.Forms.ToolStripMenuItem();
             this.intervalTimeTtoolStripComboBox = new System.Windows.Forms.ToolStripComboBox();
@@ -54,6 +54,7 @@
             this.toolStripSeparator2 = new System.Windows.Forms.ToolStripSeparator();
             this.exitToolStripMenuItem = new System.Windows.Forms.ToolStripMenuItem();
             this.openFileDialogImage = new System.Windows.Forms.OpenFileDialog();
+            this.timerMain = new System.Windows.Forms.Timer(this.components);
             ((System.ComponentModel.ISupportInitialize)(this.pictureBoxMain)).BeginInit();
             this.contextMenuStripMain.SuspendLayout();
             this.SuspendLayout();
@@ -171,8 +172,8 @@
             // slideshowToolStripMenuItem
             // 
             this.slideshowToolStripMenuItem.DropDownItems.AddRange(new System.Windows.Forms.ToolStripItem[] {
-            this.次の画像NToolStripMenuItem,
-            this.前の画像PToolStripMenuItem,
+            this.nextImageToolStripMenuItem,
+            this.prevImageToolStripMenuItem,
             this.toolStripSeparator1,
             this.enableSllideShowToolStripMenuItem,
             this.intervalTimeTtoolStripComboBox,
@@ -181,17 +182,19 @@
             this.slideshowToolStripMenuItem.Size = new System.Drawing.Size(187, 22);
             this.slideshowToolStripMenuItem.Text = "スライドショー (&S)";
             // 
-            // 次の画像NToolStripMenuItem
+            // nextImageToolStripMenuItem
             // 
-            this.次の画像NToolStripMenuItem.Name = "次の画像NToolStripMenuItem";
-            this.次の画像NToolStripMenuItem.Size = new System.Drawing.Size(181, 22);
-            this.次の画像NToolStripMenuItem.Text = "次の画像 (&N) ";
+            this.nextImageToolStripMenuItem.Name = "nextImageToolStripMenuItem";
+            this.nextImageToolStripMenuItem.Size = new System.Drawing.Size(181, 22);
+            this.nextImageToolStripMenuItem.Text = "次の画像 (&N) ";
+            this.nextImageToolStripMenuItem.Click += new System.EventHandler(this.nextImageToolStripMenuItem_Click);
             // 
-            // 前の画像PToolStripMenuItem
+            // prevImageToolStripMenuItem
             // 
-            this.前の画像PToolStripMenuItem.Name = "前の画像PToolStripMenuItem";
-            this.前の画像PToolStripMenuItem.Size = new System.Drawing.Size(181, 22);
-            this.前の画像PToolStripMenuItem.Text = "前の画像 (&P)";
+            this.prevImageToolStripMenuItem.Name = "prevImageToolStripMenuItem";
+            this.prevImageToolStripMenuItem.Size = new System.Drawing.Size(181, 22);
+            this.prevImageToolStripMenuItem.Text = "前の画像 (&P)";
+            this.prevImageToolStripMenuItem.Click += new System.EventHandler(this.prevImageToolStripMenuItem_Click);
             // 
             // toolStripSeparator1
             // 
@@ -263,6 +266,10 @@
             this.openFileDialogImage.Multiselect = true;
             this.openFileDialogImage.RestoreDirectory = true;
             // 
+            // timerMain
+            // 
+            this.timerMain.Tick += new System.EventHandler(this.timerMain_Tick);
+            // 
             // FormMain
             // 
             this.AllowDrop = true;
@@ -276,6 +283,7 @@
             this.ForeColor = System.Drawing.Color.Black;
             this.Name = "FormMain";
             this.Text = "Image Viewer";
+            this.Activated += new System.EventHandler(this.FormMain_Activated);
             this.FormClosing += new System.Windows.Forms.FormClosingEventHandler(this.FormMain_FormClosing);
             this.Shown += new System.EventHandler(this.Form1_Shown);
             this.DragDrop += new System.Windows.Forms.DragEventHandler(this.FormMain_DragDrop);
@@ -313,8 +321,9 @@
         private System.Windows.Forms.OpenFileDialog openFileDialogImage;
         private System.Windows.Forms.ToolStripSeparator toolStripSeparator1;
         private System.Windows.Forms.ToolStripMenuItem intervalRandomizeToolStripMenuItem;
-        private System.Windows.Forms.ToolStripMenuItem 次の画像NToolStripMenuItem;
-        private System.Windows.Forms.ToolStripMenuItem 前の画像PToolStripMenuItem;
+        private System.Windows.Forms.ToolStripMenuItem nextImageToolStripMenuItem;
+        private System.Windows.Forms.ToolStripMenuItem prevImageToolStripMenuItem;
+        private System.Windows.Forms.Timer timerMain;
     }
 }
 
