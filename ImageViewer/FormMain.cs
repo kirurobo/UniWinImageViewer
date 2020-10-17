@@ -192,7 +192,7 @@ namespace UniWinImageViewer
             if (m_targetFiles.Count < 1) return;
 
             var path = m_targetFiles[m_targetFileIndex];
-            //Console.WriteLine("Loading " + path);
+            //Debug.WriteLine("Loading " + path);
 
             int backIndex = m_bitmapIndex > 0 ? 0 : 1;
             int foreIndex = m_bitmapIndex;
@@ -206,33 +206,32 @@ namespace UniWinImageViewer
 
             Stream stream = null;
             Bitmap bitmap = null;
-            //try
-            //{
-                string ext = "";
-
+            try
+            {
                 if (isUrl)
                 {
                     stream = m_webClient.OpenRead(path);
-                } else
-                {
-                    stream = File.Open(path, FileMode.Open, FileAccess.Read);
+                    bitmap = new Bitmap(stream);
                 }
-
-                bitmap = new Bitmap(stream);
+                else
+                {
+                    bitmap = new Bitmap(path);
+                }
 
                 if (ImageAnimator.CanAnimate(bitmap))
                 {
                     ImageAnimator.Animate(bitmap, new EventHandler(ImageFrameChanged));
                 }
-            //} catch
-            //{
-            //    Debug.WriteLine("Error on load: " + path);
-
-            //    bitmap = new Bitmap(DefaultImage);
-            //} finally
-            //{
+            }
+            catch
+            {
+                Debug.WriteLine("Error on load: " + path);
+                bitmap = new Bitmap(DefaultImage);
+            }
+            finally
+            {
                 if (stream != null) stream.Close();
-            //}
+            }
 
             m_bitmaps[backIndex] = bitmap;
             m_bitmapIndex = backIndex;
