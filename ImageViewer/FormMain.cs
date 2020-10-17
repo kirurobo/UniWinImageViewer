@@ -308,8 +308,9 @@ namespace UniWinImageViewer
             int width = (int)(currentBitmap.Width * m_fitScale);
             int height = (int)(currentBitmap.Height* m_fitScale);
 
-            this.ClientSize = new Size(width, height);
+            //this.ClientSize = new Size(width, height);        // Formの機能でサイズ変更する場合
 
+            m_uniwin.SetWindowSize(new UniWinCSharp.Vector2(width, height));
         }
 
         /// <summary>
@@ -639,8 +640,14 @@ namespace UniWinImageViewer
                 }
                 else
                 {
-                    this.Left += (e.Location.X - m_dragStartedCursorLocation.X);
-                    this.Top += (e.Location.Y - m_dragStartedCursorLocation.Y);
+                    //// Form の機能でのウィンドウ移動
+                    //this.Left += (e.Location.X - m_dragStartedCursorLocation.X);
+                    //this.Top += (e.Location.Y - m_dragStartedCursorLocation.Y);
+                    
+                    var pos = m_uniwin.GetWindowPosition();
+                    pos.x += (e.Location.X - m_dragStartedCursorLocation.X);
+                    pos.y -= (e.Location.Y - m_dragStartedCursorLocation.Y);    // Windowsの座標系とは逆
+                    m_uniwin.SetWindowPosition(pos);
                 }
             }
         }
