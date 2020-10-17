@@ -42,6 +42,18 @@ namespace UniWinImageViewer
         public bool HasIntervalFluctuation { get; set; } = false;
 
         /// <summary>
+        /// ジャンプを有効にするか
+        /// </summary>
+        [DataMember]
+        public bool IsJumpEnabled { get; set; } = false;
+
+        /// <summary>
+        /// ジャンプを有効にしていてもアニメーションGIFなら無効とする
+        /// </summary>
+        [DataMember]
+        public bool IsJumpDisabledInAmination { get; set; } = true;
+
+        /// <summary>
         /// 最後に開いたファイル
         /// </summary>
         [DataMember]
@@ -90,6 +102,8 @@ namespace UniWinImageViewer
             this.WindowFitScale = src.WindowFitScale;
             this.SlideShowInterval = src.SlideShowInterval;
             this.HasIntervalFluctuation = src.HasIntervalFluctuation;
+            this.IsJumpEnabled = src.IsJumpEnabled;
+            this.IsJumpDisabledInAmination = src.IsJumpDisabledInAmination;
         }
 
 

@@ -78,6 +78,7 @@
     <Reference Include="System.Xml" />
   </ItemGroup>
   <ItemGroup>
+    <Compile Include="JumpController.cs" />
     <Compile Include="Settings.cs" />
     <Compile Include="UniWinC.cs" />
     <Compile Include="FormMain.cs">
