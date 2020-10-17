@@ -6,6 +6,7 @@ using System.Diagnostics;
 using System.Drawing;
 using System.IO;
 using System.Linq;
+using System.Net;
 using System.Runtime.InteropServices;
 using System.Text;
 using System.Threading.Tasks;
@@ -43,13 +44,15 @@ namespace UniWinImageViewer
         UniWinCSharp m_uniwin;
 
         Settings m_settings = new Settings();
+
+        WebClient m_webClient = new WebClient();
         
         
         // 開くファイルのリスト
         List<string> m_targetFiles = new List<string>();
 
         string[] m_targetExtensions = {
-            ".jpg", ".jpeg", ".png", ".gif"
+            ".jpg", ".jpeg", ".png", ".gif", ".bmp", ".tiff", ".exif"
         };
 
         // リストの内何番目を表示するか
@@ -63,7 +66,7 @@ namespace UniWinImageViewer
         /// <summary>
         /// これが0でなければ、画像サイズにこれを書けたサイズにウィンドウサイズを自動調整
         /// </summary>
-        float m_fitScale = 0.0f;
+        float m_fitScale = 1.0f;
 
         /// <summary>
         /// スライドショー間隔 [s]
@@ -77,6 +80,8 @@ namespace UniWinImageViewer
         Point m_dragStartedCursorLocation;
         byte m_alphaThreshold = 0x19;
 
+        Image m_originalBackgroundImage = null;
+
         Bitmap currentBitmap
         {
             get { return m_bitmaps[m_bitmapIndex];  }
@@ -86,8 +91,13 @@ namespace UniWinImageViewer
         {
             InitializeComponent();
 
+            // 背景画像（市松）を保存
+            m_originalBackgroundImage = pictureBoxMain.BackgroundImage;
+
+            // 設定をJSONファイルから読み込み
             m_settings.Load(SettingsPath);
 
+            // 起動時からの経過時間測定を開始
             m_stopwatch.Start();
         }
 
@@ -161,33 +171,68 @@ namespace UniWinImageViewer
             }
         }
 
+        /// <summary>
+        /// URLが指定された時の処理
+        /// </summary>
+        /// <param name="url"></param>
+        void OpenUrl(string url)
+        {
+            m_targetFiles.Clear();
+            m_targetFiles.Add(url);
+            m_targetFileIndex = 0;
+            LoadImage();
+        }
+
+        /// <summary>
+        /// 現在対象となっている画像を開く
+        /// </summary>
         void LoadImage()
         {
             // ファイル指定がなければ終了
             if (m_targetFiles.Count < 1) return;
 
             var path = m_targetFiles[m_targetFileIndex];
-            Console.WriteLine("Loading " + path);
+            //Console.WriteLine("Loading " + path);
 
             int backIndex = m_bitmapIndex > 0 ? 0 : 1;
             int foreIndex = m_bitmapIndex;
 
-            Bitmap bitmap = null;
-            try
+            bool isUrl = false;
+            if (path.StartsWith("https://") || path.StartsWith("http://"))
             {
-                bitmap = new Bitmap(path);
+                // URLと判別
+                isUrl = true;
+            }
 
-                var ext = Path.GetExtension(path).ToLower();
-                if (ext == ".gif" && ImageAnimator.CanAnimate(bitmap))
+            Stream stream = null;
+            Bitmap bitmap = null;
+            //try
+            //{
+                string ext = "";
+
+                if (isUrl)
+                {
+                    stream = m_webClient.OpenRead(path);
+                } else
+                {
+                    stream = File.Open(path, FileMode.Open, FileAccess.Read);
+                }
+
+                bitmap = new Bitmap(stream);
+
+                if (ImageAnimator.CanAnimate(bitmap))
                 {
                     ImageAnimator.Animate(bitmap, new EventHandler(ImageFrameChanged));
                 }
-            } catch
-            {
-                Debug.WriteLine("Error on load: " + path);
+            //} catch
+            //{
+            //    Debug.WriteLine("Error on load: " + path);
 
-                bitmap = new Bitmap(DefaultImage);
-            }
+            //    bitmap = new Bitmap(DefaultImage);
+            //} finally
+            //{
+                if (stream != null) stream.Close();
+            //}
 
             m_bitmaps[backIndex] = bitmap;
             m_bitmapIndex = backIndex;
@@ -223,6 +268,27 @@ namespace UniWinImageViewer
 
             this.ClientSize = new Size(width, height);
 
+        }
+
+        void SetTransparent(bool isTransparent)
+        {
+            // 一時透過解除中は透過なしとして扱う
+            bool enabled = (isTransparent && !m_isOpaque);
+
+            if (enabled)
+            {
+                pictureBoxMain.BackgroundImage = null;
+            }
+            else
+            {
+                pictureBoxMain.BackgroundImage = m_originalBackgroundImage;
+            }
+
+            // 状態が変化していれば、適用
+            if (m_uniwin.IsTransparent != enabled)
+            {
+                m_uniwin.EnableTransparent(enabled);
+            }
         }
 
         /// <summary>
@@ -277,25 +343,25 @@ namespace UniWinImageViewer
         {
             bool through = false;
 
-            if ((Control.ModifierKeys & Keys.Shift) == Keys.Shift)
-            {
-                // [Shift] が押されている間、透過は抑制
-                if (m_uniwin.IsTransparent)
-                {
-                    m_uniwin.EnableTransparent(false);
-                }
-                if (m_uniwin.IsClickThrough)
-                {
-                    m_uniwin.EnableClickThrough(false);
-                }
-                return;
-            }
+            //if ((Control.ModifierKeys & Keys.Shift) == Keys.Shift)
+            //{
+            //    // [Shift] が押されている間、透過は抑制
+            //    if (m_uniwin.IsTransparent)
+            //    {
+            //        m_uniwin.EnableTransparent(false);
+            //    }
+            //    if (m_uniwin.IsClickThrough)
+            //    {
+            //        m_uniwin.EnableClickThrough(false);
+            //    }
+            //    return;
+            //}
 
-            // [Shift] が押されている間、透過は抑制
-            if (invisibleToolStripMenuItem.Checked && !m_uniwin.IsTransparent)
-            {
-                m_uniwin.EnableTransparent(true);
-            }
+            //// [Shift] が押されている間、透過は抑制
+            //if (invisibleToolStripMenuItem.Checked && !m_uniwin.IsTransparent)
+            //{
+            //    m_uniwin.EnableTransparent(true);
+            //}
 
             if (m_uniwin.IsTransparent && !m_isDragging)
             {
@@ -397,7 +463,7 @@ namespace UniWinImageViewer
         /// </summary>
         private void ApplySettings()
         {
-            m_uniwin.EnableTransparent(m_settings.IsTransparent);    // 透過状態
+            SetTransparent(m_settings.IsTransparent);               // 透過状態
             m_uniwin.EnableTopmost(m_settings.IsTompost);            // 最前面
 
             m_fitScale = m_settings.WindowFitScale;
@@ -444,7 +510,7 @@ namespace UniWinImageViewer
         private void checkBoxTransparent_CheckedChanged(object sender, EventArgs e)
         {
             invisibleToolStripMenuItem.Checked = !invisibleToolStripMenuItem.Checked;
-            m_uniwin.EnableTransparent(invisibleToolStripMenuItem.Checked && !m_isOpaque);
+            SetTransparent(invisibleToolStripMenuItem.Checked);
         }
 
         private void checkBoxTopmost_CheckedChanged(object sender, EventArgs e)
@@ -460,7 +526,9 @@ namespace UniWinImageViewer
         // ドラッグがウィンドウに入ってきたときの処理
         private void FormMain_DragEnter(object sender, DragEventArgs e)
         {
-            if (e.Data.GetDataPresent(DataFormats.FileDrop))
+            if (e.Data.GetDataPresent(DataFormats.FileDrop)
+                || e.Data.GetDataPresent("UniformResourceLocator")
+                || e.Data.GetDataPresent("UniformResourceLocatorW"))
             {
                 e.Effect = DragDropEffects.All;
             }
@@ -473,8 +541,18 @@ namespace UniWinImageViewer
         // ドロップされたときの処理
         private void FormMain_DragDrop(object sender, DragEventArgs e)
         {
-            string[] files = (string[])e.Data.GetData(DataFormats.FileDrop, false);
-            OpenFiles(files);
+            if (e.Data.GetDataPresent("UniformResourceLocator") || e.Data.GetDataPresent("UniformResourceLocatorW"))
+            {
+                // URLがドロップされた場合
+                string url = e.Data.GetData(DataFormats.Text).ToString();
+                OpenUrl(url);
+            }
+            else if (e.Data.GetDataPresent(DataFormats.FileDrop))
+            {
+                // ファイルまたはフォルダがドロップされた場合
+                string[] files = (string[])e.Data.GetData(DataFormats.FileDrop, false);
+                OpenFiles(files);
+            }
         }
 
         private void pictureBoxMain_Paint(object sender, PaintEventArgs e)
@@ -502,8 +580,6 @@ namespace UniWinImageViewer
             {
                 m_dragStartedCursorLocation = e.Location;
                 m_isDragging = true;
-
-                //if (m_uniwin != null) m_uniwin.EnableClickThrough(true);
             }
         }
 
@@ -527,18 +603,18 @@ namespace UniWinImageViewer
                 {
                     this.Left += (e.Location.X - m_dragStartedCursorLocation.X);
                     this.Top += (e.Location.Y - m_dragStartedCursorLocation.Y);
-
                 }
             }
         }
 
         private void FormMain_KeyDown(object sender, KeyEventArgs e)
         {
-            //if (e.KeyCode == Keys.ShiftKey)
-            //{
-            //    m_isOpaque = true;
-            //    m_uniwin.EnableTransparent(false);
-            //}
+            // [Shift]キーで一時的に透過解除。ただし最大化時以外
+            if (e.KeyCode == Keys.ShiftKey && !m_uniwin.IsMaximized)
+            {
+                m_isOpaque = true;
+                SetTransparent(false);
+            }
         }
         private void FormMain_KeyUp(object sender, KeyEventArgs e)
         {
@@ -556,11 +632,11 @@ namespace UniWinImageViewer
                 }
             }
 
-            //if (e.KeyCode == Keys.ShiftKey)
-            //{
-            //    m_isOpaque = false;
-            //    m_uniwin.EnableTransparent(invisibleToolStripMenuItem.Checked);
-            //}
+            if (e.KeyCode == Keys.ShiftKey)
+            {
+                m_isOpaque = false;
+                SetTransparent(invisibleToolStripMenuItem.Checked);
+            }
         }
 
         private void windowNoFitToolStripMenuItem_Click(object sender, EventArgs e)
@@ -628,10 +704,16 @@ namespace UniWinImageViewer
             UpdateClickThrough();
         }
 
-        #endregion
-
         private void FormMain_Activated(object sender, EventArgs e)
         {
+            // [Shift]キーが押されていなければ一時透過解除をやめる
+            if (m_isOpaque && (Control.ModifierKeys & Keys.Shift) != Keys.Shift)
+            {
+                m_isOpaque = false;
+                SetTransparent(invisibleToolStripMenuItem.Checked);
+            }
+
+
             // フォーカスが当たった直後はクリックスルーを強制解除
             if (m_uniwin != null) m_uniwin.EnableClickThrough(false);
         }
@@ -646,5 +728,7 @@ namespace UniWinImageViewer
         {
             UpdateSlideShowInterval();
         }
+
+        #endregion
     }
 }

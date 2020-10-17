@@ -149,6 +149,11 @@ namespace UniWinImageViewer
         private bool _isClickThrough = false;
 
         /// <summary>
+        /// 最大化されているか
+        /// </summary>
+        public bool IsMaximized { get { return (IsActive && LibUniWinC.IsMaximized()); } }
+
+        /// <summary>
         /// ウィンドウ透過方式
         /// </summary>
         private TransparentType transparentType = TransparentType.Alpha;
