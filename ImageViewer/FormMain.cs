@@ -7,6 +7,7 @@ using System.Drawing;
 using System.IO;
 using System.Linq;
 using System.Net;
+using System.Net.Http.Headers;
 using System.Runtime.InteropServices;
 using System.Text;
 using System.Threading.Tasks;
@@ -23,6 +24,26 @@ namespace UniWinImageViewer
 
     public partial class FormMain : Form
     {
+        /// <summary>
+        /// 値としてfloatを保持するコンボボックスの選択肢
+        /// </summary>
+        class FloatItem
+        {
+            public float Value;
+            public string Text;
+
+            public FloatItem(float value, string text)
+            {
+                this.Value = value;
+                this.Text = text;
+            }
+
+            public override string ToString()
+            {
+                return this.Text;
+            }
+        }
+
         /// <summary>
         /// 設定ファイルのパス
         /// 実行ファイルと同じディレクトリの config.json とする
@@ -46,8 +67,9 @@ namespace UniWinImageViewer
         Settings m_settings = new Settings();
 
         WebClient m_webClient = new WebClient();
-        
-        
+
+        Random m_random = new Random();
+
         // 開くファイルのリスト
         List<string> m_targetFiles = new List<string>();
 
@@ -75,6 +97,11 @@ namespace UniWinImageViewer
         Stopwatch m_stopwatch = new Stopwatch();
         long m_nextImageTime = 0;   // 次の画像に移る時刻
 
+        /// <summary>
+        /// スライドショー間隔にゆらぎをあたえるか
+        /// </summary>
+        bool m_hasIntervalFlactuation = false;
+
         bool m_isDragging = false;
         bool m_isOpaque = false;    // [Shift]を押している間trueになり、一時的に透過を抑制する
         Point m_dragStartedCursorLocation;
@@ -91,6 +118,9 @@ namespace UniWinImageViewer
         {
             InitializeComponent();
 
+            // コンボボックスの選択肢を作成
+            InitIntervalCombobox();
+
             // 背景画像（市松）を保存
             m_originalBackgroundImage = pictureBoxMain.BackgroundImage;
 
@@ -101,12 +131,22 @@ namespace UniWinImageViewer
             m_stopwatch.Start();
         }
 
+        void InitIntervalCombobox()
+        {
+            var items = intervalTimeTtoolStripComboBox.Items;
+            items.Add(new FloatItem(0f,  "自動切替なし"));
+            items.Add(new FloatItem(5f,  " 5 秒で次画像"));
+            items.Add(new FloatItem(10f, "10 秒で次画像"));
+            items.Add(new FloatItem(30f, "30 秒で次画像"));
+            items.Add(new FloatItem(60f, "60 秒で次画像"));
+        }
+
         void ForwardImage(int step)
         {
             int count = m_targetFiles.Count;
-            if (count < 1)
+            if (count <= 1)
             {
-                // ファイル指定が無かった場合
+                // ファイル指定が無かった場合か、1つしかなかった場合は再読み込みしない
                 m_targetFileIndex = 0;
                 return;
             }
@@ -249,6 +289,9 @@ namespace UniWinImageViewer
             FitWindowSize();
 
             pictureBoxMain.Invalidate();
+
+            // スライドショーリセット
+            RestartSlideShow();
         }
 
         void ImageFrameChanged(object obj, EventArgs e)
@@ -269,6 +312,10 @@ namespace UniWinImageViewer
 
         }
 
+        /// <summary>
+        /// ウィンドウ透過を設定／解除
+        /// </summary>
+        /// <param name="isTransparent"></param>
         void SetTransparent(bool isTransparent)
         {
             // 一時透過解除中は透過なしとして扱う
@@ -320,47 +367,34 @@ namespace UniWinImageViewer
             windowFitsTwiceImageToolStripMenuItem.Checked = (m_fitScale == 2.0f);
 
             // スライドショー間隔
-            if (m_slideShowInterval > 0)
+            var items = intervalTimeTtoolStripComboBox.Items;
+            bool wasSelected = false;
+            foreach(FloatItem item in items)
             {
-                enableSllideShowToolStripMenuItem.Checked = true;
-                intervalTimeTtoolStripComboBox.Enabled = true;
-                intervalTimeTtoolStripComboBox.Text = m_slideShowInterval.ToString("0.0") + " 秒";
+                // 誤差 0.1 いないなら同じとみなす
+                if (Math.Abs(item.Value - m_slideShowInterval) < 0.1)
+                {
+                    intervalTimeTtoolStripComboBox.SelectedItem = item;
+                    m_slideShowInterval = item.Value;
+                    wasSelected = true;
+                    break;
+                }
             }
-            else
+            if (!wasSelected)
             {
-                enableSllideShowToolStripMenuItem.Checked = false;
-                intervalTimeTtoolStripComboBox.Enabled = false;
-                intervalTimeTtoolStripComboBox.Text = "";
+                intervalTimeTtoolStripComboBox.SelectedIndex = 0;
+                m_slideShowInterval = 0f;
             }
 
+            intervalRandomizeToolStripMenuItem.Checked = m_hasIntervalFlactuation;
         }
 
         /// <summary>
-        /// クリックスルーすべきか判断して更新
+        /// カーソル座標により、クリックスルーすべきか判断して更新
         /// </summary>
         void UpdateClickThrough()
         {
             bool through = false;
-
-            //if ((Control.ModifierKeys & Keys.Shift) == Keys.Shift)
-            //{
-            //    // [Shift] が押されている間、透過は抑制
-            //    if (m_uniwin.IsTransparent)
-            //    {
-            //        m_uniwin.EnableTransparent(false);
-            //    }
-            //    if (m_uniwin.IsClickThrough)
-            //    {
-            //        m_uniwin.EnableClickThrough(false);
-            //    }
-            //    return;
-            //}
-
-            //// [Shift] が押されている間、透過は抑制
-            //if (invisibleToolStripMenuItem.Checked && !m_uniwin.IsTransparent)
-            //{
-            //    m_uniwin.EnableTransparent(true);
-            //}
 
             if (m_uniwin.IsTransparent && !m_isDragging)
             {
@@ -424,35 +458,36 @@ namespace UniWinImageViewer
 
         void UpdateSlideShowInterval()
         {
-            float interval = 0;
-
-            if (enableSllideShowToolStripMenuItem.Checked)
-            {
-                if (!float.TryParse(intervalTimeTtoolStripComboBox.Text, out interval))
-                {
-                    intervalTimeTtoolStripComboBox.Text = "";
-                }
-            }
-            else
-            {
-                //if (intervalTimeTtoolStripComboBox)
-            }
+            FloatItem item = (FloatItem)intervalTimeTtoolStripComboBox.SelectedItem;
+            float interval = item.Value;
 
             //  負の時間はなし
             if (interval <= 0) interval = 0;
 
-            // スライドショー開始
-            if (interval > 0)
+            // 時間に変更があれば、スライドショー開始
+            if (interval != m_slideShowInterval)
             {
                 m_slideShowInterval = interval;
-                m_nextImageTime = m_stopwatch.ElapsedMilliseconds + (int)(interval * 1000);
+                RestartSlideShow();
+            }
+        }
+
+        /// <summary>
+        /// スライドショー開始（実行中なら時間をリセット）
+        /// </summary>
+        void RestartSlideShow()
+        {
+            int delta;
+            if (m_hasIntervalFlactuation)
+            {
+                // 指定秒数の 10% ～ 100% のランダムとする
+                delta = (int)(m_slideShowInterval * m_random.Next(100, 1000));
             }
             else
             {
-                m_slideShowInterval = 0;
-
+                delta = (int)(m_slideShowInterval * 1000f);
             }
-
+            m_nextImageTime = m_stopwatch.ElapsedMilliseconds + delta;
         }
 
         #region 設定保存関連
@@ -463,9 +498,11 @@ namespace UniWinImageViewer
         private void ApplySettings()
         {
             SetTransparent(m_settings.IsTransparent);               // 透過状態
-            m_uniwin.EnableTopmost(m_settings.IsTompost);            // 最前面
+            m_uniwin.EnableTopmost(m_settings.IsTompost);           // 最前面
 
-            m_fitScale = m_settings.WindowFitScale;
+            m_fitScale = m_settings.WindowFitScale;                 // ウィンドウサイズを画像に合わせる倍率
+            m_slideShowInterval = m_settings.SlideShowInterval;     // スライドショー間隔
+            m_hasIntervalFlactuation = m_settings.HasIntervalFluctuation;   // 間隔ゆらぎあり
         }
 
         /// <summary>
@@ -476,6 +513,8 @@ namespace UniWinImageViewer
             m_settings.IsTransparent = m_uniwin.IsTransparent;
             m_settings.IsTompost= m_uniwin.IsTopmost;
             m_settings.WindowFitScale = m_fitScale;
+            m_settings.SlideShowInterval = m_slideShowInterval;
+            m_settings.HasIntervalFluctuation = m_hasIntervalFlactuation;
 
             m_settings.Save(SettingsPath);
         }
@@ -700,6 +739,7 @@ namespace UniWinImageViewer
 
         private void timerMain_Tick(object sender, EventArgs e)
         {
+            UpdateSlideShow();
             UpdateClickThrough();
         }
 
@@ -717,17 +757,23 @@ namespace UniWinImageViewer
             if (m_uniwin != null) m_uniwin.EnableClickThrough(false);
         }
 
-        private void enableSllideShowToolStripMenuItem_Click(object sender, EventArgs e)
-        {
-            enableSllideShowToolStripMenuItem.Checked = !enableSllideShowToolStripMenuItem.Checked;
-            UpdateSlideShowInterval();
-        }
-
         private void intervalTimeTtoolStripComboBox_TextChanged(object sender, EventArgs e)
         {
             UpdateSlideShowInterval();
         }
 
         #endregion
+
+        private void intervalTimeTtoolStripComboBox_SelectedIndexChanged(object sender, EventArgs e)
+        {
+            UpdateSlideShowInterval();
+        }
+
+        private void intervalRandomizeToolStripMenuItem_Click(object sender, EventArgs e)
+        {
+            intervalRandomizeToolStripMenuItem.Checked = !intervalRandomizeToolStripMenuItem.Checked;
+            m_hasIntervalFlactuation = intervalRandomizeToolStripMenuItem.Checked;
+            RestartSlideShow();
+        }
     }
 }

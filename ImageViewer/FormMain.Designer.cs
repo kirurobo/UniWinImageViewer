@@ -45,7 +45,6 @@
             this.nextImageToolStripMenuItem = new System.Windows.Forms.ToolStripMenuItem();
             this.prevImageToolStripMenuItem = new System.Windows.Forms.ToolStripMenuItem();
             this.toolStripSeparator1 = new System.Windows.Forms.ToolStripSeparator();
-            this.enableSllideShowToolStripMenuItem = new System.Windows.Forms.ToolStripMenuItem();
             this.intervalTimeTtoolStripComboBox = new System.Windows.Forms.ToolStripComboBox();
             this.intervalRandomizeToolStripMenuItem = new System.Windows.Forms.ToolStripMenuItem();
             this.motionToolStripMenuItem = new System.Windows.Forms.ToolStripMenuItem();
@@ -65,8 +64,9 @@
             this.pictureBoxMain.BackgroundImage = global::UniWinImageViewer.Properties.Resources.BackGround;
             this.pictureBoxMain.Dock = System.Windows.Forms.DockStyle.Fill;
             this.pictureBoxMain.Location = new System.Drawing.Point(0, 0);
+            this.pictureBoxMain.Margin = new System.Windows.Forms.Padding(5, 4, 5, 4);
             this.pictureBoxMain.Name = "pictureBoxMain";
-            this.pictureBoxMain.Size = new System.Drawing.Size(384, 361);
+            this.pictureBoxMain.Size = new System.Drawing.Size(640, 542);
             this.pictureBoxMain.SizeMode = System.Windows.Forms.PictureBoxSizeMode.Zoom;
             this.pictureBoxMain.TabIndex = 4;
             this.pictureBoxMain.TabStop = false;
@@ -89,7 +89,7 @@
             this.toolStripSeparator2,
             this.exitToolStripMenuItem});
             this.contextMenuStripMain.Name = "contextMenuStripMain";
-            this.contextMenuStripMain.Size = new System.Drawing.Size(255, 240);
+            this.contextMenuStripMain.Size = new System.Drawing.Size(255, 273);
             // 
             // openToolStripMenuItem
             // 
@@ -169,7 +169,6 @@
             this.nextImageToolStripMenuItem,
             this.prevImageToolStripMenuItem,
             this.toolStripSeparator1,
-            this.enableSllideShowToolStripMenuItem,
             this.intervalTimeTtoolStripComboBox,
             this.intervalRandomizeToolStripMenuItem});
             this.slideshowToolStripMenuItem.Name = "slideshowToolStripMenuItem";
@@ -179,46 +178,38 @@
             // nextImageToolStripMenuItem
             // 
             this.nextImageToolStripMenuItem.Name = "nextImageToolStripMenuItem";
-            this.nextImageToolStripMenuItem.Size = new System.Drawing.Size(261, 34);
+            this.nextImageToolStripMenuItem.Size = new System.Drawing.Size(270, 34);
             this.nextImageToolStripMenuItem.Text = "次の画像 (&N) ";
             this.nextImageToolStripMenuItem.Click += new System.EventHandler(this.nextImageToolStripMenuItem_Click);
             // 
             // prevImageToolStripMenuItem
             // 
             this.prevImageToolStripMenuItem.Name = "prevImageToolStripMenuItem";
-            this.prevImageToolStripMenuItem.Size = new System.Drawing.Size(261, 34);
+            this.prevImageToolStripMenuItem.Size = new System.Drawing.Size(270, 34);
             this.prevImageToolStripMenuItem.Text = "前の画像 (&P)";
             this.prevImageToolStripMenuItem.Click += new System.EventHandler(this.prevImageToolStripMenuItem_Click);
             // 
             // toolStripSeparator1
             // 
             this.toolStripSeparator1.Name = "toolStripSeparator1";
-            this.toolStripSeparator1.Size = new System.Drawing.Size(258, 6);
-            // 
-            // enableSllideShowToolStripMenuItem
-            // 
-            this.enableSllideShowToolStripMenuItem.Name = "enableSllideShowToolStripMenuItem";
-            this.enableSllideShowToolStripMenuItem.Size = new System.Drawing.Size(261, 34);
-            this.enableSllideShowToolStripMenuItem.Text = "一定時間で切替 (&0)";
-            this.enableSllideShowToolStripMenuItem.Click += new System.EventHandler(this.enableSllideShowToolStripMenuItem_Click);
+            this.toolStripSeparator1.Size = new System.Drawing.Size(267, 6);
             // 
             // intervalTimeTtoolStripComboBox
             // 
-            this.intervalTimeTtoolStripComboBox.Items.AddRange(new object[] {
-            "5 秒",
-            "10 秒",
-            "30 秒",
-            "60 秒"});
+            this.intervalTimeTtoolStripComboBox.DropDownStyle = System.Windows.Forms.ComboBoxStyle.DropDownList;
             this.intervalTimeTtoolStripComboBox.Name = "intervalTimeTtoolStripComboBox";
             this.intervalTimeTtoolStripComboBox.Size = new System.Drawing.Size(121, 33);
+            this.intervalTimeTtoolStripComboBox.ToolTipText = "スライドショーの切替時間";
+            this.intervalTimeTtoolStripComboBox.SelectedIndexChanged += new System.EventHandler(this.intervalTimeTtoolStripComboBox_SelectedIndexChanged);
             this.intervalTimeTtoolStripComboBox.TextChanged += new System.EventHandler(this.intervalTimeTtoolStripComboBox_TextChanged);
             // 
             // intervalRandomizeToolStripMenuItem
             // 
             this.intervalRandomizeToolStripMenuItem.Name = "intervalRandomizeToolStripMenuItem";
-            this.intervalRandomizeToolStripMenuItem.Size = new System.Drawing.Size(261, 34);
+            this.intervalRandomizeToolStripMenuItem.Size = new System.Drawing.Size(270, 34);
             this.intervalRandomizeToolStripMenuItem.Text = "時間にゆらぎ (&R)";
             this.intervalRandomizeToolStripMenuItem.ToolTipText = "指定時間内でランダム性を与えます";
+            this.intervalRandomizeToolStripMenuItem.Click += new System.EventHandler(this.intervalRandomizeToolStripMenuItem_Click);
             // 
             // motionToolStripMenuItem
             // 
@@ -269,14 +260,15 @@
             // FormMain
             // 
             this.AllowDrop = true;
-            this.AutoScaleDimensions = new System.Drawing.SizeF(6F, 12F);
+            this.AutoScaleDimensions = new System.Drawing.SizeF(10F, 18F);
             this.AutoScaleMode = System.Windows.Forms.AutoScaleMode.Font;
             this.BackColor = System.Drawing.SystemColors.Control;
-            this.ClientSize = new System.Drawing.Size(384, 361);
+            this.ClientSize = new System.Drawing.Size(640, 542);
             this.ContextMenuStrip = this.contextMenuStripMain;
             this.Controls.Add(this.pictureBoxMain);
             this.ForeColor = System.Drawing.Color.Black;
             this.Icon = ((System.Drawing.Icon)(resources.GetObject("$this.Icon")));
+            this.Margin = new System.Windows.Forms.Padding(5, 4, 5, 4);
             this.Name = "FormMain";
             this.Text = "Image Viewer";
             this.Activated += new System.EventHandler(this.FormMain_Activated);
@@ -306,7 +298,6 @@
         private System.Windows.Forms.ToolStripMenuItem windowFitsHalfImageToolStripMenuItem;
         private System.Windows.Forms.ToolStripMenuItem windowFitsTwiceImageToolStripMenuItem;
         private System.Windows.Forms.ToolStripMenuItem slideshowToolStripMenuItem;
-        private System.Windows.Forms.ToolStripMenuItem enableSllideShowToolStripMenuItem;
         private System.Windows.Forms.ToolStripComboBox intervalTimeTtoolStripComboBox;
         private System.Windows.Forms.ToolStripMenuItem motionToolStripMenuItem;
         private System.Windows.Forms.ToolStripMenuItem jumpToolStripMenuItem;

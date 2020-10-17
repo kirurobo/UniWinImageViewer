@@ -36,6 +36,12 @@ namespace UniWinImageViewer
         public float SlideShowInterval{ get; set; } = 0;
 
         /// <summary>
+        /// スライドショー間隔をゆらがせるか
+        /// </summary>
+        [DataMember]
+        public bool HasIntervalFluctuation { get; set; } = false;
+
+        /// <summary>
         /// 最後に開いたファイル
         /// </summary>
         [DataMember]
@@ -83,6 +89,7 @@ namespace UniWinImageViewer
             this.RecentFile = src.RecentFile;
             this.WindowFitScale = src.WindowFitScale;
             this.SlideShowInterval = src.SlideShowInterval;
+            this.HasIntervalFluctuation = src.HasIntervalFluctuation;
         }
 
 
