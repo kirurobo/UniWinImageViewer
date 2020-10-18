@@ -7,7 +7,7 @@
 
 ## 動作環境
 - Windows 10
-- .NET Framework 4.72
+- .NET Framework 4.7.2
   - Windows 10 の更新ができていればおそらく対応しています
 
 ## インストール
