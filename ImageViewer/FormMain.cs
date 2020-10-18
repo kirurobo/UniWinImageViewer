@@ -18,11 +18,7 @@ namespace UniWinImageViewer
 {
     /// <summary>
     /// 画像ビューア
-    /// 
-    /// アイコンは ICON HOIHOI 様のものを利用
-    /// http://iconhoihoi.oops.jp/item/2010/12/85-map-OTHER.html
     /// </summary>
-
     public partial class FormMain : Form
     {
         /// <summary>
