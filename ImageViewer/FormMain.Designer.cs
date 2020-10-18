@@ -57,6 +57,8 @@
             this.openFileDialogImage = new System.Windows.Forms.OpenFileDialog();
             this.timerMain = new System.Windows.Forms.Timer(this.components);
             this.timerMotion = new System.Windows.Forms.Timer(this.components);
+            this.helpToolStripMenuItem = new System.Windows.Forms.ToolStripMenuItem();
+            this.toolStripSeparator5 = new System.Windows.Forms.ToolStripSeparator();
             ((System.ComponentModel.ISupportInitialize)(this.pictureBoxMain)).BeginInit();
             this.contextMenuStripMain.SuspendLayout();
             this.SuspendLayout();
@@ -89,28 +91,30 @@
             this.slideshowToolStripMenuItem,
             this.motionToolStripMenuItem,
             this.toolStripSeparator2,
+            this.helpToolStripMenuItem,
+            this.toolStripSeparator5,
             this.exitToolStripMenuItem});
             this.contextMenuStripMain.Name = "contextMenuStripMain";
-            this.contextMenuStripMain.Size = new System.Drawing.Size(188, 192);
+            this.contextMenuStripMain.Size = new System.Drawing.Size(225, 198);
             // 
             // openToolStripMenuItem
             // 
             this.openToolStripMenuItem.Name = "openToolStripMenuItem";
             this.openToolStripMenuItem.ShortcutKeys = ((System.Windows.Forms.Keys)((System.Windows.Forms.Keys.Control | System.Windows.Forms.Keys.O)));
-            this.openToolStripMenuItem.Size = new System.Drawing.Size(187, 22);
+            this.openToolStripMenuItem.Size = new System.Drawing.Size(224, 22);
             this.openToolStripMenuItem.Text = "開く (&O)";
             this.openToolStripMenuItem.Click += new System.EventHandler(this.openToolStripMenuItem_Click);
             // 
             // toolStripSeparator3
             // 
             this.toolStripSeparator3.Name = "toolStripSeparator3";
-            this.toolStripSeparator3.Size = new System.Drawing.Size(184, 6);
+            this.toolStripSeparator3.Size = new System.Drawing.Size(221, 6);
             // 
             // invisibleToolStripMenuItem
             // 
             this.invisibleToolStripMenuItem.Name = "invisibleToolStripMenuItem";
             this.invisibleToolStripMenuItem.ShortcutKeys = ((System.Windows.Forms.Keys)((System.Windows.Forms.Keys.Control | System.Windows.Forms.Keys.I)));
-            this.invisibleToolStripMenuItem.Size = new System.Drawing.Size(187, 22);
+            this.invisibleToolStripMenuItem.Size = new System.Drawing.Size(224, 22);
             this.invisibleToolStripMenuItem.Text = "透明化 (&I)";
             this.invisibleToolStripMenuItem.Click += new System.EventHandler(this.checkBoxTransparent_CheckedChanged);
             // 
@@ -118,7 +122,7 @@
             // 
             this.topmostToolStripMenuItem.Name = "topmostToolStripMenuItem";
             this.topmostToolStripMenuItem.ShortcutKeys = ((System.Windows.Forms.Keys)((System.Windows.Forms.Keys.Control | System.Windows.Forms.Keys.T)));
-            this.topmostToolStripMenuItem.Size = new System.Drawing.Size(187, 22);
+            this.topmostToolStripMenuItem.Size = new System.Drawing.Size(224, 22);
             this.topmostToolStripMenuItem.Text = "常に最前面 (&T)";
             this.topmostToolStripMenuItem.Click += new System.EventHandler(this.checkBoxTopmost_CheckedChanged);
             // 
@@ -130,7 +134,7 @@
             this.windowFitsHalfImageToolStripMenuItem,
             this.windowFitsTwiceImageToolStripMenuItem});
             this.windowSizeToolStripMenuItem.Name = "windowSizeToolStripMenuItem";
-            this.windowSizeToolStripMenuItem.Size = new System.Drawing.Size(187, 22);
+            this.windowSizeToolStripMenuItem.Size = new System.Drawing.Size(224, 22);
             this.windowSizeToolStripMenuItem.Text = "ウィンドウサイズ (&W)";
             // 
             // windowNoFitToolStripMenuItem
@@ -174,7 +178,7 @@
             this.intervalTimeToolStripComboBox,
             this.intervalRandomizeToolStripMenuItem});
             this.slideshowToolStripMenuItem.Name = "slideshowToolStripMenuItem";
-            this.slideshowToolStripMenuItem.Size = new System.Drawing.Size(187, 22);
+            this.slideshowToolStripMenuItem.Size = new System.Drawing.Size(224, 22);
             this.slideshowToolStripMenuItem.Text = "スライドショー (&S)";
             // 
             // nextImageToolStripMenuItem
@@ -221,7 +225,7 @@
             this.toolStripSeparator4,
             this.resetWindowPositionToolStripMenuItem});
             this.motionToolStripMenuItem.Name = "motionToolStripMenuItem";
-            this.motionToolStripMenuItem.Size = new System.Drawing.Size(187, 22);
+            this.motionToolStripMenuItem.Size = new System.Drawing.Size(224, 22);
             this.motionToolStripMenuItem.Text = "動き (&M)";
             // 
             // jumpToolStripComboBox
@@ -254,13 +258,13 @@
             // toolStripSeparator2
             // 
             this.toolStripSeparator2.Name = "toolStripSeparator2";
-            this.toolStripSeparator2.Size = new System.Drawing.Size(184, 6);
+            this.toolStripSeparator2.Size = new System.Drawing.Size(221, 6);
             // 
             // exitToolStripMenuItem
             // 
             this.exitToolStripMenuItem.Name = "exitToolStripMenuItem";
             this.exitToolStripMenuItem.ShortcutKeys = ((System.Windows.Forms.Keys)((System.Windows.Forms.Keys.Alt | System.Windows.Forms.Keys.F4)));
-            this.exitToolStripMenuItem.Size = new System.Drawing.Size(187, 22);
+            this.exitToolStripMenuItem.Size = new System.Drawing.Size(224, 22);
             this.exitToolStripMenuItem.Text = "終了 (&X)";
             this.exitToolStripMenuItem.Click += new System.EventHandler(this.exitToolStripMenuItem_Click);
             // 
@@ -268,7 +272,8 @@
             // 
             this.openFileDialogImage.CheckFileExists = false;
             this.openFileDialogImage.CheckPathExists = false;
-            this.openFileDialogImage.Filter = "画像 (*.jpg,*.gif,*.png)|*.jpg;*.jpeg;*.jfif;*.gif;*.png|全てのファイル|*.*";
+            this.openFileDialogImage.Filter = "画像 (*.jpg,*.gif,*.png,*.bmp,*.tiff)|*.jpg;*.jpeg;*.gif;*.png;*.bmp;*.exif;*.tiff|" +
+    "全てのファイル|*.*";
             this.openFileDialogImage.Multiselect = true;
             this.openFileDialogImage.RestoreDirectory = true;
             // 
@@ -280,6 +285,19 @@
             // 
             this.timerMotion.Interval = 20;
             this.timerMotion.Tick += new System.EventHandler(this.timerMotion_Tick);
+            // 
+            // helpToolStripMenuItem
+            // 
+            this.helpToolStripMenuItem.Name = "helpToolStripMenuItem";
+            this.helpToolStripMenuItem.ShortcutKeys = ((System.Windows.Forms.Keys)((System.Windows.Forms.Keys.Control | System.Windows.Forms.Keys.OemQuestion)));
+            this.helpToolStripMenuItem.Size = new System.Drawing.Size(224, 22);
+            this.helpToolStripMenuItem.Text = "情報 (&H)";
+            this.helpToolStripMenuItem.Click += new System.EventHandler(this.helpToolStripMenuItem_Click);
+            // 
+            // toolStripSeparator5
+            // 
+            this.toolStripSeparator5.Name = "toolStripSeparator5";
+            this.toolStripSeparator5.Size = new System.Drawing.Size(221, 6);
             // 
             // FormMain
             // 
@@ -336,6 +354,8 @@
         private System.Windows.Forms.ToolStripMenuItem resetWindowPositionToolStripMenuItem;
         private System.Windows.Forms.Timer timerMotion;
         private System.Windows.Forms.ToolStripComboBox jumpToolStripComboBox;
+        private System.Windows.Forms.ToolStripMenuItem helpToolStripMenuItem;
+        private System.Windows.Forms.ToolStripSeparator toolStripSeparator5;
     }
 }
 

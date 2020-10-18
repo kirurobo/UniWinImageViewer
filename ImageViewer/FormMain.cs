@@ -199,7 +199,7 @@ namespace UniWinImageViewer
             string[] files = { DefaultImage };  // デフォルト画像のパス
             // コマンドライン引数で渡されたものがあればファイルとみなす
             var args = System.Environment.GetCommandLineArgs();
-            if (args.Length > 2)
+            if (args.Length > 1)
             {
                 files = new string[args.Length - 1];
                 for (int i = 1; i < args.Length; i++)
@@ -983,5 +983,11 @@ namespace UniWinImageViewer
         }
 
         #endregion
+
+        private void helpToolStripMenuItem_Click(object sender, EventArgs e)
+        {
+            var help = new AboutBoxHelp();
+            help.ShowDialog(this);
+        }
     }
 }

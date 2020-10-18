@@ -21,7 +21,7 @@ namespace UniWinImageViewer
         /// 最前面か
         /// </summary>
         [DataMember]
-        public bool IsTompost { get; set; } = true;
+        public bool IsTompost { get; set; } = false;
 
         /// <summary>
         /// ウィンドウサイズを画像に合わせる際の係数。0なら合わせない
@@ -51,7 +51,7 @@ namespace UniWinImageViewer
         /// ジャンプを有効にしていてもアニメーションGIFなら無効とする
         /// </summary>
         [DataMember]
-        public bool IsJumpDisabledInAmination { get; set; } = true;
+        public bool IsJumpDisabledInAmination { get; set; } = false;
 
         /// <summary>
         /// 最後に開いたファイル

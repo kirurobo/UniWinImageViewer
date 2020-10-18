@@ -93,6 +93,12 @@
     <Reference Include="System.Xml" />
   </ItemGroup>
   <ItemGroup>
+    <Compile Include="AboutBoxHelp.cs">
+      <SubType>Form</SubType>
+    </Compile>
+    <Compile Include="AboutBoxHelp.Designer.cs">
+      <DependentUpon>AboutBoxHelp.cs</DependentUpon>
+    </Compile>
     <Compile Include="JumpController.cs" />
     <Compile Include="Settings.cs" />
     <Compile Include="UniWinC.cs" />
@@ -104,6 +110,9 @@
     </Compile>
     <Compile Include="Program.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
+    <EmbeddedResource Include="AboutBoxHelp.resx">
+      <DependentUpon>AboutBoxHelp.cs</DependentUpon>
+    </EmbeddedResource>
     <EmbeddedResource Include="FormMain.resx">
       <DependentUpon>FormMain.cs</DependentUpon>
     </EmbeddedResource>
@@ -135,7 +144,11 @@
     <Content Include="default.png">
       <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
     </Content>
+    <Content Include="icon-128.png" />
     <Content Include="icon.ico" />
+    <Content Include="readme.txt">
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+    </Content>
     <None Include="Resources\BackGround.png" />
   </ItemGroup>
   <ItemGroup>

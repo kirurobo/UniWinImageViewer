@@ -1,0 +1,209 @@
+﻿<?xml version="1.0" encoding="utf-8"?>
+<root>
+  <!-- 
+    Microsoft ResX Schema 
+    
+    Version 2.0
+    
+    The primary goals of this format is to allow a simple XML format 
+    that is mostly human readable. The generation and parsing of the 
+    various data types are done through the TypeConverter classes 
+    associated with the data types.
+    
+    Example:
+    
+    ... ado.net/XML headers & schema ...
+    <resheader name="resmimetype">text/microsoft-resx</resheader>
+    <resheader name="version">2.0</resheader>
+    <resheader name="reader">System.Resources.ResXResourceReader, System.Windows.Forms, ...</resheader>
+    <resheader name="writer">System.Resources.ResXResourceWriter, System.Windows.Forms, ...</resheader>
+    <data name="Name1"><value>this is my long string</value><comment>this is a comment</comment></data>
+    <data name="Color1" type="System.Drawing.Color, System.Drawing">Blue</data>
+    <data name="Bitmap1" mimetype="application/x-microsoft.net.object.binary.base64">
+        <value>[base64 mime encoded serialized .NET Framework object]</value>
+    </data>
+    <data name="Icon1" type="System.Drawing.Icon, System.Drawing" mimetype="application/x-microsoft.net.object.bytearray.base64">
+        <value>[base64 mime encoded string representing a byte array form of the .NET Framework object]</value>
+        <comment>This is a comment</comment>
+    </data>
+                
+    There are any number of "resheader" rows that contain simple 
+    name/value pairs.
+    
+    Each data row contains a name, and value. The row also contains a 
+    type or mimetype. Type corresponds to a .NET class that support 
+    text/value conversion through the TypeConverter architecture. 
+    Classes that don't support this are serialized and stored with the 
+    mimetype set.
+    
+    The mimetype is used for serialized objects, and tells the 
+    ResXResourceReader how to depersist the object. This is currently not 
+    extensible. For a given mimetype the value must be set accordingly:
+    
+    Note - application/x-microsoft.net.object.binary.base64 is the format 
+    that the ResXResourceWriter will generate, however the reader can 
+    read any of the formats listed below.
+    
+    mimetype: application/x-microsoft.net.object.binary.base64
+    value   : The object must be serialized with 
+            : System.Runtime.Serialization.Formatters.Binary.BinaryFormatter
+            : and then encoded with base64 encoding.
+    
+    mimetype: application/x-microsoft.net.object.soap.base64
+    value   : The object must be serialized with 
+            : System.Runtime.Serialization.Formatters.Soap.SoapFormatter
+            : and then encoded with base64 encoding.
+
+    mimetype: application/x-microsoft.net.object.bytearray.base64
+    value   : The object must be serialized into a byte array 
+            : using a System.ComponentModel.TypeConverter
+            : and then encoded with base64 encoding.
+    -->
+  <xsd:schema id="root" xmlns="" xmlns:xsd="http://www.w3.org/2001/XMLSchema" xmlns:msdata="urn:schemas-microsoft-com:xml-msdata">
+    <xsd:import namespace="http://www.w3.org/XML/1998/namespace" />
+    <xsd:element name="root" msdata:IsDataSet="true">
+      <xsd:complexType>
+        <xsd:choice maxOccurs="unbounded">
+          <xsd:element name="metadata">
+            <xsd:complexType>
+              <xsd:sequence>
+                <xsd:element name="value" type="xsd:string" minOccurs="0" />
+              </xsd:sequence>
+              <xsd:attribute name="name" use="required" type="xsd:string" />
+              <xsd:attribute name="type" type="xsd:string" />
+              <xsd:attribute name="mimetype" type="xsd:string" />
+              <xsd:attribute ref="xml:space" />
+            </xsd:complexType>
+          </xsd:element>
+          <xsd:element name="assembly">
+            <xsd:complexType>
+              <xsd:attribute name="alias" type="xsd:string" />
+              <xsd:attribute name="name" type="xsd:string" />
+            </xsd:complexType>
+          </xsd:element>
+          <xsd:element name="data">
+            <xsd:complexType>
+              <xsd:sequence>
+                <xsd:element name="value" type="xsd:string" minOccurs="0" msdata:Ordinal="1" />
+                <xsd:element name="comment" type="xsd:string" minOccurs="0" msdata:Ordinal="2" />
+              </xsd:sequence>
+              <xsd:attribute name="name" type="xsd:string" use="required" msdata:Ordinal="1" />
+              <xsd:attribute name="type" type="xsd:string" msdata:Ordinal="3" />
+              <xsd:attribute name="mimetype" type="xsd:string" msdata:Ordinal="4" />
+              <xsd:attribute ref="xml:space" />
+            </xsd:complexType>
+          </xsd:element>
+          <xsd:element name="resheader">
+            <xsd:complexType>
+              <xsd:sequence>
+                <xsd:element name="value" type="xsd:string" minOccurs="0" msdata:Ordinal="1" />
+              </xsd:sequence>
+              <xsd:attribute name="name" type="xsd:string" use="required" />
+            </xsd:complexType>
+          </xsd:element>
+        </xsd:choice>
+      </xsd:complexType>
+    </xsd:element>
+  </xsd:schema>
+  <resheader name="resmimetype">
+    <value>text/microsoft-resx</value>
+  </resheader>
+  <resheader name="version">
+    <value>2.0</value>
+  </resheader>
+  <resheader name="reader">
+    <value>System.Resources.ResXResourceReader, System.Windows.Forms, Version=4.0.0.0, Culture=neutral, PublicKeyToken=b77a5c561934e089</value>
+  </resheader>
+  <resheader name="writer">
+    <value>System.Resources.ResXResourceWriter, System.Windows.Forms, Version=4.0.0.0, Culture=neutral, PublicKeyToken=b77a5c561934e089</value>
+  </resheader>
+  <data name="textBoxLicense.Text" xml:space="preserve">
+    <value>ライセンス
+
+MIT License
+
+Copyright (c) 2020 Kirurobo
+
+Permission is hereby granted, free of charge, to any person obtaining a copy
+of this software and associated documentation files (the "Software"), to deal
+in the Software without restriction, including without limitation the rights
+to use, copy, modify, merge, publish, distribute, sublicense, and/or sell
+copies of the Software, and to permit persons to whom the Software is
+furnished to do so, subject to the following conditions:
+
+The above copyright notice and this permission notice shall be included in all
+copies or substantial portions of the Software.
+
+THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR
+IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF MERCHANTABILITY,
+FITNESS FOR A PARTICULAR PURPOSE AND NONINFRINGEMENT. IN NO EVENT SHALL THE
+AUTHORS OR COPYRIGHT HOLDERS BE LIABLE FOR ANY CLAIM, DAMAGES OR OTHER
+LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM,
+OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
+SOFTWARE.</value>
+  </data>
+  <assembly alias="System.Drawing" name="System.Drawing, Version=4.0.0.0, Culture=neutral, PublicKeyToken=b03f5f7f11d50a3a" />
+  <data name="logoPictureBox.Image" type="System.Drawing.Bitmap, System.Drawing" mimetype="application/x-microsoft.net.object.bytearray.base64">
+    <value>
+        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
+        rkJggg==
+</value>
+  </data>
+  <data name="textBoxDescription.Text" xml:space="preserve">
+    <value>透過表示のできる画像ビューアです。ぴょんぴょん動く機能つき。
+
+【メニュー】
+右クリックでメニューが出ます。
+
+【画像の開き方】
+・メニューの「ファイルを開く」か、ファイルやフォルダをドロップしてください。
+・複数ファイルやフォルダをドロップした場合、スライドショーとして一定時間で順番に切り替えたり、カーソルキー左右か[Space][BS]で切り替えできます。
+（フォルダ内のさらにサブフォルダは検索しません。）
+
+【ウィンドウ透過】
+（PC環境があっていれば）ウィンドウ枠を透過できます。
+ [Shift] キーを押している間は一時的に透過は無効となりサイズ調整などできます。
+
+【ウィンドウを見失ったとき】
+タスクバーから本アプリをアクティブにして [Ctrl]+[.] を押すと画面左下付近に移動します。
+あるいは [Ctrl]+[I] で透過をON/OFFできます。
+それでもだめならタスクバーのアイコンを右クリックして閉じてください。</value>
+  </data>
+</root>

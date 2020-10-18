@@ -6,12 +6,12 @@ using System.Runtime.InteropServices;
 // アセンブリに関する一般情報は以下の属性セットをとおして制御されます。
 // 制御されます。アセンブリに関連付けられている情報を変更するには、
 // これらの属性値を変更します。
-[assembly: AssemblyTitle("ぴょんぴょん画像ビューア")]
+[assembly: AssemblyTitle("PyonPyonImageViewer")]
 [assembly: AssemblyDescription("透過できる画像ビューアです。ついでにぴょんぴょんします。")]
 [assembly: AssemblyConfiguration("")]
 [assembly: AssemblyCompany("Kirurobo")]
-[assembly: AssemblyProduct("PyonPyonImageViewer")]
-[assembly: AssemblyCopyright("Copyright ©  2020 Kirurobo")]
+[assembly: AssemblyProduct("ぴょんぴょん画像ビューア")]
+[assembly: AssemblyCopyright("Copyright ©  2020 Kirurobo  https://twitter.com/kirurobo")]
 [assembly: AssemblyTrademark("")]
 [assembly: AssemblyCulture("")]
 
