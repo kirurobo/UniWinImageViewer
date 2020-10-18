@@ -141,10 +141,17 @@ namespace UniWinImageViewer
                 var json = new DataContractJsonSerializer(typeof(Settings));
                 json.WriteObject(stream, settings);
 
-                using (var writer= new StreamWriter(path, false, DataEncoding))
+                try
                 {
-                    byte[] buff = stream.ToArray();
-                    writer.WriteLine(DataEncoding.GetString(buff, 0, buff.Length));
+                    using (var fs = new FileStream(path, FileMode.Create, FileAccess.Write, FileShare.None))
+                    using (var writer = new StreamWriter(fs, DataEncoding))
+                    {
+                        byte[] buff = stream.ToArray();
+                        writer.WriteLine(DataEncoding.GetString(buff, 0, buff.Length));
+                    }
+                } catch (System.IO.IOException ex)
+                {
+
                 }
             }
         }
