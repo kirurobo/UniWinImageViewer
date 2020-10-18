@@ -33,12 +33,12 @@ namespace UniWinImageViewer
         long nextJumpMilliSeconds = 0;
 
         /// <summary>
-        /// 次のジャンプまでの最低待ち秒数
+        /// 次のジャンプまでの最低待ち時間 [ms]
         /// </summary>
         public int minWait = 1000;
 
         /// <summary>
-        /// 次のジャンプまでの最大待ち秒数
+        /// 次のジャンプまでの最大待ち時間 [ms]
         /// </summary>
         public int maxWait = 10000;
 
@@ -115,7 +115,7 @@ namespace UniWinImageViewer
 
                     // ジャンプ開始
                     var size = uniwin.GetWindowSize();
-                    height = size.y * 0.1;              // ジャンプ高さを設定
+                    height = size.y * (0.1 + random.NextDouble() * 0.1);   // ジャンプ高さを画像との比率で設定
                     pixelPerMeter = size.y * 1.0;
 
                     BeginJumping();

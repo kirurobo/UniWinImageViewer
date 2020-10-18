@@ -42,10 +42,10 @@ namespace UniWinImageViewer
         public bool HasIntervalFluctuation { get; set; } = false;
 
         /// <summary>
-        /// ジャンプを有効にするか
+        /// ジャンプ頻度 何秒以内に1回程度か
         /// </summary>
         [DataMember]
-        public bool IsJumpEnabled { get; set; } = false;
+        public float JumpFrequency { get; set; } = 0;
 
         /// <summary>
         /// ジャンプを有効にしていてもアニメーションGIFなら無効とする
@@ -102,7 +102,7 @@ namespace UniWinImageViewer
             this.WindowFitScale = src.WindowFitScale;
             this.SlideShowInterval = src.SlideShowInterval;
             this.HasIntervalFluctuation = src.HasIntervalFluctuation;
-            this.IsJumpEnabled = src.IsJumpEnabled;
+            this.JumpFrequency = src.JumpFrequency;
             this.IsJumpDisabledInAmination = src.IsJumpDisabledInAmination;
         }
 

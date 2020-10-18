@@ -105,9 +105,9 @@ namespace UniWinImageViewer
         bool m_hasIntervalFlactuation = false;
 
         /// <summary>
-        /// ジャンプが有効か
+        /// ジャンプ頻度。0ならジャンプなし
         /// </summary>
-        bool m_isJumpEnabled = false;
+        float m_jumpFrequency = 0f;
 
         /// <summary>
         /// アニメーションGIFではジャンプをしない
@@ -152,14 +152,29 @@ namespace UniWinImageViewer
 
         }
 
+        /// <summary>
+        /// コンボボックスの選択肢初期化
+        /// </summary>
         void InitIntervalCombobox()
         {
-            var items = intervalTimeTtoolStripComboBox.Items;
+            ComboBox.ObjectCollection items;
+
+            // スライドショー間隔の選択肢
+            items = intervalTimeToolStripComboBox.Items;
             items.Add(new FloatItem(0f,  "自動切替なし"));
             items.Add(new FloatItem(5f,  " 5 秒で次画像"));
             items.Add(new FloatItem(10f, "10 秒で次画像"));
             items.Add(new FloatItem(30f, "30 秒で次画像"));
             items.Add(new FloatItem(60f, "60 秒で次画像"));
+
+            // ジャンプ頻度の選択肢
+            items = jumpToolStripComboBox.Items;
+            items.Add(new FloatItem( 0f, "ぴょんぴょんしない"));
+            items.Add(new FloatItem(60f, "稀にぴょんぴょん"));
+            items.Add(new FloatItem(30f, "時折ぴょんぴょん"));
+            items.Add(new FloatItem(10f, "割合ぴょんぴょん"));
+            items.Add(new FloatItem( 5f, "結構ぴょんぴょん"));
+            items.Add(new FloatItem( 2f, "頻繁ぴょんぴょん"));
         }
 
         /// <summary>
@@ -378,8 +393,9 @@ namespace UniWinImageViewer
 
         void StartMotion()
         {
-            if (m_isJumpEnabled)
+            if (m_jumpFrequency > 0f)
             {
+                SetJumpFrequency();
                 m_jumper.Start();
             }
         }
@@ -387,6 +403,12 @@ namespace UniWinImageViewer
         void StopMotion()
         {
             m_jumper.Stop();
+        }
+
+        void SetJumpFrequency()
+        {
+            m_jumper.minWait = (int)(m_jumpFrequency * 200f);   // 最大の2割を最低とする
+            m_jumper.maxWait = (int)(m_jumpFrequency * 1000f);
         }
 
         void FitWindowSize()
@@ -469,10 +491,6 @@ namespace UniWinImageViewer
             invisibleToolStripMenuItem.Checked = m_isTransparent;
             topmostToolStripMenuItem.Checked = m_isTopmost;
 
-            // 動き設定
-            jumpToolStripMenuItem.Checked = m_isJumpEnabled;
-            disableJumpForAnimationToolStripMenuItem.Checked = m_isJumpDisabledForAnim;
-
             // 画像サイズへのフィット
             windowNoFitToolStripMenuItem.Checked = (m_fitScale == 0f);
             windowFitsImageToolStripMenuItem.Checked = (m_fitScale == 1.0f);
@@ -480,14 +498,13 @@ namespace UniWinImageViewer
             windowFitsTwiceImageToolStripMenuItem.Checked = (m_fitScale == 2.0f);
 
             // スライドショー間隔
-            var items = intervalTimeTtoolStripComboBox.Items;
             bool wasSelected = false;
-            foreach(FloatItem item in items)
+            foreach(FloatItem item in intervalTimeToolStripComboBox.Items)
             {
-                // 誤差 0.1 いないなら同じとみなす
+                // 誤差 0.1 以内なら同じとみなす
                 if (Math.Abs(item.Value - m_slideShowInterval) < 0.1)
                 {
-                    intervalTimeTtoolStripComboBox.SelectedItem = item;
+                    intervalTimeToolStripComboBox.SelectedItem = item;
                     m_slideShowInterval = item.Value;
                     wasSelected = true;
                     break;
@@ -495,11 +512,30 @@ namespace UniWinImageViewer
             }
             if (!wasSelected)
             {
-                intervalTimeTtoolStripComboBox.SelectedIndex = 0;
+                intervalTimeToolStripComboBox.SelectedIndex = 0;
                 m_slideShowInterval = 0f;
             }
-
             intervalRandomizeToolStripMenuItem.Checked = m_hasIntervalFlactuation;
+
+            // ジャンプ頻度
+            wasSelected = false;
+            foreach (FloatItem item in jumpToolStripComboBox.Items)
+            {
+                // 誤差 0.1 以内なら同じとみなす
+                if (Math.Abs(item.Value - m_jumpFrequency) < 0.1)
+                {
+                    jumpToolStripComboBox.SelectedItem = item;
+                    m_jumpFrequency = item.Value;
+                    wasSelected = true;
+                    break;
+                }
+            }
+            if (!wasSelected)
+            {
+                jumpToolStripComboBox.SelectedIndex = 0;
+                m_jumpFrequency = 0f;
+            }
+            disableJumpForAnimationToolStripMenuItem.Checked = m_isJumpDisabledForAnim;
         }
 
         /// <summary>
@@ -570,19 +606,34 @@ namespace UniWinImageViewer
             }
         }
 
+        /// <summary>
+        /// スライドショー間隔が変更された時の処理
+        /// </summary>
         void UpdateSlideShowInterval()
         {
-            FloatItem item = (FloatItem)intervalTimeTtoolStripComboBox.SelectedItem;
+            FloatItem item = (FloatItem)intervalTimeToolStripComboBox.SelectedItem;
             float interval = item.Value;
-
-            //  負の時間はなし
-            if (interval <= 0) interval = 0;
 
             // 時間に変更があれば、スライドショー開始
             if (interval != m_slideShowInterval)
             {
                 m_slideShowInterval = interval;
                 RestartSlideShow();
+            }
+        }
+
+        /// <summary>
+        /// ジャンプ頻度が変更された時の処理
+        /// </summary>
+        void UpdateJUmpInterval()
+        {
+            FloatItem item = (FloatItem)jumpToolStripComboBox.SelectedItem;
+            m_jumpFrequency = item.Value;
+
+            // ジャンプ頻度を適用
+            if (m_jumpFrequency > 0)
+            {
+                SetJumpFrequency();
             }
         }
 
@@ -620,7 +671,7 @@ namespace UniWinImageViewer
             m_slideShowInterval = m_settings.SlideShowInterval;     // スライドショー間隔
             m_hasIntervalFlactuation = m_settings.HasIntervalFluctuation;   // 間隔ゆらぎあり
 
-            m_isJumpEnabled = m_settings.IsJumpEnabled;             // ジャンプするか
+            m_jumpFrequency = m_settings.JumpFrequency;                     // ジャンプ頻度
             m_isJumpDisabledForAnim = m_settings.IsJumpDisabledInAmination; // アニメーション画像ではジャンプを抑制するか
             StartMotion();
         }
@@ -635,7 +686,7 @@ namespace UniWinImageViewer
             m_settings.WindowFitScale = m_fitScale;
             m_settings.SlideShowInterval = m_slideShowInterval;
             m_settings.HasIntervalFluctuation = m_hasIntervalFlactuation;
-            m_settings.IsJumpEnabled = m_isJumpEnabled;
+            m_settings.JumpFrequency = m_jumpFrequency;
             m_settings.IsJumpDisabledInAmination = m_isJumpDisabledForAnim;
 
             m_settings.Save(SettingsPath);
@@ -892,14 +943,22 @@ namespace UniWinImageViewer
             if (m_uniwin != null) m_uniwin.EnableClickThrough(false);
         }
 
-        private void intervalTimeTtoolStripComboBox_TextChanged(object sender, EventArgs e)
+        private void intervalTimeTtoolStripComboBox_SelectedIndexChanged(object sender, EventArgs e)
         {
             UpdateSlideShowInterval();
         }
 
-        private void intervalTimeTtoolStripComboBox_SelectedIndexChanged(object sender, EventArgs e)
+        private void jumpToolStripComboBox_SelectedIndexChanged(object sender, EventArgs e)
         {
-            UpdateSlideShowInterval();
+            UpdateJUmpInterval();
+            if (m_jumpFrequency > 0)
+            {
+                StartMotion();
+            }
+            else
+            {
+                StopMotion();
+            }
         }
 
         private void intervalRandomizeToolStripMenuItem_Click(object sender, EventArgs e)
@@ -913,20 +972,6 @@ namespace UniWinImageViewer
         {
             // 原点（プライマリモニタの左下）付近にウィンドウを強制移動
             m_uniwin.SetWindowPosition(new Vector2(60, 60));
-        }
-
-        private void jumpToolStripMenuItem_Click(object sender, EventArgs e)
-        {
-            jumpToolStripMenuItem.Checked = !jumpToolStripMenuItem.Checked;
-            m_isJumpEnabled = jumpToolStripMenuItem.Checked;
-            if (m_isJumpEnabled)
-            {
-                StartMotion();
-            }
-            else
-            {
-                StopMotion();
-            }
         }
 
         private void disableJumpForAnimationToolStripMenuItem_Click(object sender, EventArgs e)
