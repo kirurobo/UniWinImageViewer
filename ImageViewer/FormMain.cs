@@ -134,8 +134,11 @@ namespace UniWinImageViewer
         /// </summary>
         void Initialize()
         {
+            // コンテキストメニュー文字列の修正
+            InitializeContextMenuItems();
+
             // コンボボックスの選択肢を作成
-            InitIntervalCombobox();
+            InitializeIntervalCombobox();
 
             // 背景画像（市松）を保存
             m_originalBackgroundImage = pictureBoxMain.BackgroundImage;
@@ -146,12 +149,30 @@ namespace UniWinImageViewer
             // 起動時からの経過時間測定を開始
             m_stopwatch.Start();
 
+            // マウスホイールイベントハンドラを用意
+            MouseWheel += FormMain_MouseWheel;
+
+        }
+
+        /// <summary>
+        /// コンテキストメニューのショートカットキー表示を更新
+        ///   標準ではいまいちなもの、設定できていない分について付け足し
+        /// </summary>
+        void InitializeContextMenuItems()
+        {
+            helpToolStripMenuItem.ShortcutKeyDisplayString = "Ctrl+?";
+            exitToolStripMenuItem.ShortcutKeyDisplayString = "Esc";
+            nextImageToolStripMenuItem.ShortcutKeyDisplayString = "Space / →";
+            prevImageToolStripMenuItem.ShortcutKeyDisplayString = "BS / ←";
+            resetWindowPositionToolStripMenuItem.ShortcutKeyDisplayString = "Ctrl+.";
+            windowFitsHalfImageToolStripMenuItem.ShortcutKeyDisplayString = "Ctrl+[-]";
+            windowFitsTwiceImageToolStripMenuItem.ShortcutKeyDisplayString = "Ctrl+[+]";
         }
 
         /// <summary>
         /// コンボボックスの選択肢初期化
         /// </summary>
-        void InitIntervalCombobox()
+        void InitializeIntervalCombobox()
         {
             ComboBox.ObjectCollection items;
 
@@ -214,7 +235,7 @@ namespace UniWinImageViewer
 
         void ForwardImage(int step)
         {
-            if (m_targetFiles.Count <= 0)
+            if (m_targetFiles.Count <= 1)
             {
                 // ファイル指定が無かった場合か、1つしかなかった場合は再読み込みしない
                 m_targetFileIndex = 0;
@@ -407,6 +428,9 @@ namespace UniWinImageViewer
             m_jumper.maxWait = (int)(m_jumpFrequency * 1000f);
         }
 
+        /// <summary>
+        /// ウィンドウサイズを画像の何倍かに合わせる
+        /// </summary>
         void FitWindowSize()
         {
             // 0ならサイズ調整なし
@@ -421,6 +445,18 @@ namespace UniWinImageViewer
             //this.ClientSize = new Size(width, height);        // Formの機能でサイズ変更する場合
 
             m_uniwin.SetWindowSize(new UniWinCSharp.Vector2(width, height));
+        }
+
+        /// <summary>
+        /// 指定スケールで現在のウィンドウサイズを変更
+        /// </summary>
+        /// <param name="scale"></param>
+        void ScaleWindowSize(float scale)
+        {
+            var size = m_uniwin.GetWindowSize();
+            size.x *= scale;
+            size.y *= scale;
+            m_uniwin.SetWindowSize(size);
         }
 
         /// <summary>
@@ -664,6 +700,7 @@ namespace UniWinImageViewer
             m_uniwin.EnableTopmost(m_isTopmost);
 
             m_fitScale = m_settings.WindowFitScale;                 // ウィンドウサイズを画像に合わせる倍率
+            if (float.IsNaN(m_fitScale)) m_fitScale = 1.0f;         // 倍率が正しくなければ1に戻す
             m_slideShowInterval = m_settings.SlideShowInterval;     // スライドショー間隔
             m_hasIntervalFlactuation = m_settings.HasIntervalFluctuation;   // 間隔ゆらぎあり
 
@@ -849,6 +886,12 @@ namespace UniWinImageViewer
                     ForwardImage(-1);
                     e.Handled = true;
                 }
+                else if (e.KeyCode == Keys.Escape)
+                {
+                    // [ESC] で終了
+                    Close();
+                    e.Handled = true;
+                }
             }
 
             if (e.KeyCode == Keys.ShiftKey)
@@ -859,6 +902,41 @@ namespace UniWinImageViewer
                 StartMotion();
             }
         }
+
+        /// <summary>
+        /// マウスホイール操作時のイベント
+        /// </summary>
+        /// <param name="sender"></param>
+        /// <param name="e"></param>
+        private void FormMain_MouseWheel(object sender, MouseEventArgs e)
+        {
+            if (e.Button == MouseButtons.None)
+            {
+                float scale = (float)Math.Pow(10.0, e.Delta * 0.0005);
+
+                // 今のマウス座標が中心となって拡大縮小するよう、位置を調整
+                var pos = m_uniwin.GetWindowPosition();
+                float sx = e.X * (1f - scale);
+                float sy = (Height - e.Y) * (1f - scale);
+                pos.x += sx;
+                pos.y += sy;
+                m_uniwin.SetWindowPosition(pos);
+
+                // ウィンドウを拡大縮小
+                if (m_fitScale != 0)
+                {
+                    // 画像サイズにフィットする場合
+                    m_fitScale *= scale;
+                    FitWindowSize();
+                }
+                else
+                {
+                    // 画像サイズへのフィット無しの場合は、現在のウィンドウサイズを基準に変更
+                    ScaleWindowSize(scale);
+                }
+            }
+        }
+
 
         private void windowNoFitToolStripMenuItem_Click(object sender, EventArgs e)
         {
@@ -937,6 +1015,16 @@ namespace UniWinImageViewer
 
             // フォーカスが当たった直後はクリックスルーを強制解除
             if (m_uniwin != null) m_uniwin.EnableClickThrough(false);
+        }
+
+        private void FormMain_Deactivate(object sender, EventArgs e)
+        {
+            // フォーカスを失ったら、一時透過解除
+            if (m_isOpaque)
+            {
+                m_isOpaque = false;
+                SetTransparent(m_isTransparent);
+            }
         }
 
         private void intervalTimeTtoolStripComboBox_SelectedIndexChanged(object sender, EventArgs e)

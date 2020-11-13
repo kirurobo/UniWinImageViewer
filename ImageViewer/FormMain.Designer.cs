@@ -53,12 +53,12 @@
             this.toolStripSeparator4 = new System.Windows.Forms.ToolStripSeparator();
             this.resetWindowPositionToolStripMenuItem = new System.Windows.Forms.ToolStripMenuItem();
             this.toolStripSeparator2 = new System.Windows.Forms.ToolStripSeparator();
+            this.helpToolStripMenuItem = new System.Windows.Forms.ToolStripMenuItem();
+            this.toolStripSeparator5 = new System.Windows.Forms.ToolStripSeparator();
             this.exitToolStripMenuItem = new System.Windows.Forms.ToolStripMenuItem();
             this.openFileDialogImage = new System.Windows.Forms.OpenFileDialog();
             this.timerMain = new System.Windows.Forms.Timer(this.components);
             this.timerMotion = new System.Windows.Forms.Timer(this.components);
-            this.helpToolStripMenuItem = new System.Windows.Forms.ToolStripMenuItem();
-            this.toolStripSeparator5 = new System.Windows.Forms.ToolStripSeparator();
             ((System.ComponentModel.ISupportInitialize)(this.pictureBoxMain)).BeginInit();
             this.contextMenuStripMain.SuspendLayout();
             this.SuspendLayout();
@@ -185,14 +185,14 @@
             // 
             this.nextImageToolStripMenuItem.Name = "nextImageToolStripMenuItem";
             this.nextImageToolStripMenuItem.Size = new System.Drawing.Size(220, 22);
-            this.nextImageToolStripMenuItem.Text = "次の画像 (&N)   Space / →";
+            this.nextImageToolStripMenuItem.Text = "次の画像 (&N) ";
             this.nextImageToolStripMenuItem.Click += new System.EventHandler(this.nextImageToolStripMenuItem_Click);
             // 
             // prevImageToolStripMenuItem
             // 
             this.prevImageToolStripMenuItem.Name = "prevImageToolStripMenuItem";
             this.prevImageToolStripMenuItem.Size = new System.Drawing.Size(220, 22);
-            this.prevImageToolStripMenuItem.Text = "前の画像 (&P)  BS / ←";
+            this.prevImageToolStripMenuItem.Text = "前の画像 (&P) ";
             this.prevImageToolStripMenuItem.Click += new System.EventHandler(this.prevImageToolStripMenuItem_Click);
             // 
             // toolStripSeparator1
@@ -260,10 +260,22 @@
             this.toolStripSeparator2.Name = "toolStripSeparator2";
             this.toolStripSeparator2.Size = new System.Drawing.Size(221, 6);
             // 
+            // helpToolStripMenuItem
+            // 
+            this.helpToolStripMenuItem.Name = "helpToolStripMenuItem";
+            this.helpToolStripMenuItem.ShortcutKeys = ((System.Windows.Forms.Keys)((System.Windows.Forms.Keys.Control | System.Windows.Forms.Keys.OemQuestion)));
+            this.helpToolStripMenuItem.Size = new System.Drawing.Size(224, 22);
+            this.helpToolStripMenuItem.Text = "情報 (&H)";
+            this.helpToolStripMenuItem.Click += new System.EventHandler(this.helpToolStripMenuItem_Click);
+            // 
+            // toolStripSeparator5
+            // 
+            this.toolStripSeparator5.Name = "toolStripSeparator5";
+            this.toolStripSeparator5.Size = new System.Drawing.Size(221, 6);
+            // 
             // exitToolStripMenuItem
             // 
             this.exitToolStripMenuItem.Name = "exitToolStripMenuItem";
-            this.exitToolStripMenuItem.ShortcutKeys = ((System.Windows.Forms.Keys)((System.Windows.Forms.Keys.Alt | System.Windows.Forms.Keys.F4)));
             this.exitToolStripMenuItem.Size = new System.Drawing.Size(224, 22);
             this.exitToolStripMenuItem.Text = "終了 (&X)";
             this.exitToolStripMenuItem.Click += new System.EventHandler(this.exitToolStripMenuItem_Click);
@@ -286,19 +298,6 @@
             this.timerMotion.Interval = 20;
             this.timerMotion.Tick += new System.EventHandler(this.timerMotion_Tick);
             // 
-            // helpToolStripMenuItem
-            // 
-            this.helpToolStripMenuItem.Name = "helpToolStripMenuItem";
-            this.helpToolStripMenuItem.ShortcutKeys = ((System.Windows.Forms.Keys)((System.Windows.Forms.Keys.Control | System.Windows.Forms.Keys.OemQuestion)));
-            this.helpToolStripMenuItem.Size = new System.Drawing.Size(224, 22);
-            this.helpToolStripMenuItem.Text = "情報 (&H)";
-            this.helpToolStripMenuItem.Click += new System.EventHandler(this.helpToolStripMenuItem_Click);
-            // 
-            // toolStripSeparator5
-            // 
-            this.toolStripSeparator5.Name = "toolStripSeparator5";
-            this.toolStripSeparator5.Size = new System.Drawing.Size(221, 6);
-            // 
             // FormMain
             // 
             this.AllowDrop = true;
@@ -313,6 +312,7 @@
             this.Name = "FormMain";
             this.Text = "Image Viewer";
             this.Activated += new System.EventHandler(this.FormMain_Activated);
+            this.Deactivate += new System.EventHandler(this.FormMain_Deactivate);
             this.FormClosing += new System.Windows.Forms.FormClosingEventHandler(this.FormMain_FormClosing);
             this.Shown += new System.EventHandler(this.FormMain_Shown);
             this.DragDrop += new System.Windows.Forms.DragEventHandler(this.FormMain_DragDrop);
