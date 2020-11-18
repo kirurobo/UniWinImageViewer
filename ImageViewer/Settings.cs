@@ -94,16 +94,49 @@ namespace UniWinImageViewer
         /// 引数の値をthisに複製
         /// </summary>
         /// <param name="src"></param>
-        private void Clone(Settings src)
+        public void Clone(Settings src)
         {
-            this.IsTompost = src.IsTompost;
-            this.IsTransparent = src.IsTransparent;
-            this.RecentFile = src.RecentFile;
-            this.WindowFitScale = src.WindowFitScale;
-            this.SlideShowInterval = src.SlideShowInterval;
-            this.HasIntervalFluctuation = src.HasIntervalFluctuation;
-            this.JumpFrequency = src.JumpFrequency;
-            this.IsJumpDisabledInAmination = src.IsJumpDisabledInAmination;
+            //this.IsTompost = src.IsTompost;
+            //this.IsTransparent = src.IsTransparent;
+            //this.RecentFile = src.RecentFile;
+            //this.WindowFitScale = src.WindowFitScale;
+            //this.SlideShowInterval = src.SlideShowInterval;
+            //this.HasIntervalFluctuation = src.HasIntervalFluctuation;
+            //this.JumpFrequency = src.JumpFrequency;
+            //this.IsJumpDisabledInAmination = src.IsJumpDisabledInAmination;
+
+            foreach (var property in typeof(Settings).GetProperties())
+            {
+                property.SetValue(this, property.GetValue(src));
+            }
+        }
+
+        /// <summary>
+        /// 設定内容が等しければ true
+        /// </summary>
+        /// <param name="src"></param>
+        /// <param name="dst"></param>
+        /// <returns></returns>
+        public static bool operator== (Settings src, Settings dst)
+        {
+            foreach (var property in typeof(Settings).GetProperties())
+            {
+                if (property.GetValue(src) != property.GetValue(dst)) {
+                    return false;
+                }
+            }
+            return true;
+        }
+
+        /// <summary>
+        /// 設定内容が等しくなければ true
+        /// </summary>
+        /// <param name="src"></param>
+        /// <param name="dst"></param>
+        /// <returns></returns>
+        public static bool operator!= (Settings src, Settings dst)
+        {
+            return !(src == dst);
         }
 
 

@@ -134,6 +134,9 @@ namespace UniWinImageViewer
         /// </summary>
         void Initialize()
         {
+            m_bitmaps[0] = null;
+            m_bitmaps[1] = null;
+
             // コンテキストメニュー文字列の修正
             InitializeContextMenuItems();
 
@@ -225,6 +228,9 @@ namespace UniWinImageViewer
                 }
             }
             OpenFiles(files);
+
+            // なぜか、最初にアニメーションGIFを開くととても重いため、初回は同じファイルを２度開いてみる
+            LoadImage();
 
             // クリックスルー判定ループを開始
             timerMain.Start();
@@ -712,17 +718,24 @@ namespace UniWinImageViewer
         /// <summary>
         /// 設定を保存
         /// </summary>
-        private void SaveSettings()
+        private void SaveSettings(bool forceSave = false)
         {
-            m_settings.IsTransparent = m_isTransparent;
-            m_settings.IsTompost= m_isTopmost;
-            m_settings.WindowFitScale = m_fitScale;
-            m_settings.SlideShowInterval = m_slideShowInterval;
-            m_settings.HasIntervalFluctuation = m_hasIntervalFlactuation;
-            m_settings.JumpFrequency = m_jumpFrequency;
-            m_settings.IsJumpDisabledInAmination = m_isJumpDisabledForAnim;
+            Settings tmpSettings = new Settings();
 
-            m_settings.Save(SettingsPath);
+            tmpSettings.IsTransparent = m_isTransparent;
+            tmpSettings.IsTompost= m_isTopmost;
+            tmpSettings.WindowFitScale = m_fitScale;
+            tmpSettings.SlideShowInterval = m_slideShowInterval;
+            tmpSettings.HasIntervalFluctuation = m_hasIntervalFlactuation;
+            tmpSettings.JumpFrequency = m_jumpFrequency;
+            tmpSettings.IsJumpDisabledInAmination = m_isJumpDisabledForAnim;
+
+            // 強制保存する場合か、変更があれば保存
+            if (forceSave || (m_settings != tmpSettings))
+            {
+                m_settings.Clone(tmpSettings);
+                m_settings.Save(SettingsPath);
+            }
         }
 
         #endregion
@@ -748,38 +761,7 @@ namespace UniWinImageViewer
         private void FormMain_FormClosing(object sender, FormClosingEventArgs e)
         {
             // 設定を保存
-            SaveSettings();
-        }
-
-        private void checkBoxTransparent_CheckedChanged(object sender, EventArgs e)
-        {
-            m_isTransparent = invisibleToolStripMenuItem.Checked = !invisibleToolStripMenuItem.Checked;
-            SetTransparent(m_isTransparent);
-        }
-
-        private void checkBoxTopmost_CheckedChanged(object sender, EventArgs e)
-        {
-            m_isTopmost = topmostToolStripMenuItem.Checked = !topmostToolStripMenuItem.Checked;
-            m_uniwin.EnableTopmost(m_isTopmost);
-        }
-
-        private void FormMain_Resize(object sender, EventArgs e)
-        {
-        }
-
-        // ドラッグがウィンドウに入ってきたときの処理
-        private void FormMain_DragEnter(object sender, DragEventArgs e)
-        {
-            if (e.Data.GetDataPresent(DataFormats.FileDrop)
-                || e.Data.GetDataPresent("UniformResourceLocator")
-                || e.Data.GetDataPresent("UniformResourceLocatorW"))
-            {
-                e.Effect = DragDropEffects.All;
-            }
-            else
-            {
-                e.Effect = DragDropEffects.None;
-            }
+            SaveSettings(true);
         }
 
         // ドロップされたときの処理
@@ -804,18 +786,39 @@ namespace UniWinImageViewer
             ImageAnimator.UpdateFrames(currentBitmap);
         }
 
-        private void openToolStripMenuItem_Click(object sender, EventArgs e)
+        private void timerMain_Tick(object sender, EventArgs e)
         {
-            if (openFileDialogImage.ShowDialog() == DialogResult.OK) {
-                string[] files = openFileDialogImage.FileNames;
-                OpenFiles(files);
-            }
-            openFileDialogImage.Dispose();
+            UpdateFrame();
         }
 
-        private void exitToolStripMenuItem_Click(object sender, EventArgs e)
+        private void timerMotion_Tick(object sender, EventArgs e)
         {
-            Application.Exit();
+            // 運動がある場合の更新
+            m_jumper.Update();
+        }
+
+        private void FormMain_Activated(object sender, EventArgs e)
+        {
+            // [Shift]キーが押されていなければ一時透過解除をやめる
+            if (m_isOpaque && (Control.ModifierKeys & Keys.Shift) != Keys.Shift)
+            {
+                m_isOpaque = false;
+                SetTransparent(m_isTransparent);
+            }
+
+
+            // フォーカスが当たった直後はクリックスルーを強制解除
+            if (m_uniwin != null) m_uniwin.EnableClickThrough(false);
+        }
+
+        private void FormMain_Deactivate(object sender, EventArgs e)
+        {
+            // フォーカスを失ったら、一時透過解除
+            if (m_isOpaque)
+            {
+                m_isOpaque = false;
+                SetTransparent(m_isTransparent);
+            }
         }
 
         private void FormMain_MouseDown(object sender, MouseEventArgs e)
@@ -938,6 +941,54 @@ namespace UniWinImageViewer
         }
 
 
+        private void openToolStripMenuItem_Click(object sender, EventArgs e)
+        {
+            if (openFileDialogImage.ShowDialog() == DialogResult.OK)
+            {
+                string[] files = openFileDialogImage.FileNames;
+                OpenFiles(files);
+            }
+            openFileDialogImage.Dispose();
+        }
+
+        private void exitToolStripMenuItem_Click(object sender, EventArgs e)
+        {
+            Application.Exit();
+        }
+
+        private void checkBoxTransparent_CheckedChanged(object sender, EventArgs e)
+        {
+            m_isTransparent = invisibleToolStripMenuItem.Checked = !invisibleToolStripMenuItem.Checked;
+            SetTransparent(m_isTransparent);
+            SaveSettings();
+        }
+
+        private void checkBoxTopmost_CheckedChanged(object sender, EventArgs e)
+        {
+            m_isTopmost = topmostToolStripMenuItem.Checked = !topmostToolStripMenuItem.Checked;
+            m_uniwin.EnableTopmost(m_isTopmost);
+            SaveSettings();
+        }
+
+        private void FormMain_Resize(object sender, EventArgs e)
+        {
+        }
+
+        // ドラッグがウィンドウに入ってきたときの処理
+        private void FormMain_DragEnter(object sender, DragEventArgs e)
+        {
+            if (e.Data.GetDataPresent(DataFormats.FileDrop)
+                || e.Data.GetDataPresent("UniformResourceLocator")
+                || e.Data.GetDataPresent("UniformResourceLocatorW"))
+            {
+                e.Effect = DragDropEffects.All;
+            }
+            else
+            {
+                e.Effect = DragDropEffects.None;
+            }
+        }
+
         private void windowNoFitToolStripMenuItem_Click(object sender, EventArgs e)
         {
             m_fitScale = 0;
@@ -947,6 +998,7 @@ namespace UniWinImageViewer
             windowFitsTwiceImageToolStripMenuItem.Checked = false;
 
             FitWindowSize();
+            SaveSettings();
         }
 
         private void windowFitsImageToolStripMenuItem_Click(object sender, EventArgs e)
@@ -958,6 +1010,7 @@ namespace UniWinImageViewer
             windowFitsTwiceImageToolStripMenuItem.Checked = false;
 
             FitWindowSize();
+            SaveSettings();
         }
 
         private void windowFitsHalfImageToolStripMenuItem_Click(object sender, EventArgs e)
@@ -969,6 +1022,7 @@ namespace UniWinImageViewer
             windowFitsTwiceImageToolStripMenuItem.Checked = false;
 
             FitWindowSize();
+            SaveSettings();
         }
 
         private void windowFitsTwiceImageToolStripMenuItem_Click(object sender, EventArgs e)
@@ -980,6 +1034,7 @@ namespace UniWinImageViewer
             windowFitsTwiceImageToolStripMenuItem.Checked = true;
 
             FitWindowSize();
+            SaveSettings();
         }
 
         private void nextImageToolStripMenuItem_Click(object sender, EventArgs e)
@@ -992,44 +1047,10 @@ namespace UniWinImageViewer
             ForwardImage(-1);
         }
 
-        private void timerMain_Tick(object sender, EventArgs e)
-        {
-            UpdateFrame();
-        }
-
-        private void timerMotion_Tick(object sender, EventArgs e)
-        {
-            // 運動がある場合の更新
-            m_jumper.Update();
-        }
-
-        private void FormMain_Activated(object sender, EventArgs e)
-        {
-            // [Shift]キーが押されていなければ一時透過解除をやめる
-            if (m_isOpaque && (Control.ModifierKeys & Keys.Shift) != Keys.Shift)
-            {
-                m_isOpaque = false;
-                SetTransparent(m_isTransparent);
-            }
-
-
-            // フォーカスが当たった直後はクリックスルーを強制解除
-            if (m_uniwin != null) m_uniwin.EnableClickThrough(false);
-        }
-
-        private void FormMain_Deactivate(object sender, EventArgs e)
-        {
-            // フォーカスを失ったら、一時透過解除
-            if (m_isOpaque)
-            {
-                m_isOpaque = false;
-                SetTransparent(m_isTransparent);
-            }
-        }
-
         private void intervalTimeTtoolStripComboBox_SelectedIndexChanged(object sender, EventArgs e)
         {
             UpdateSlideShowInterval();
+            SaveSettings();
         }
 
         private void jumpToolStripComboBox_SelectedIndexChanged(object sender, EventArgs e)
@@ -1043,6 +1064,7 @@ namespace UniWinImageViewer
             {
                 StopMotion();
             }
+            SaveSettings();
         }
 
         private void intervalRandomizeToolStripMenuItem_Click(object sender, EventArgs e)
@@ -1050,6 +1072,7 @@ namespace UniWinImageViewer
             intervalRandomizeToolStripMenuItem.Checked = !intervalRandomizeToolStripMenuItem.Checked;
             m_hasIntervalFlactuation = intervalRandomizeToolStripMenuItem.Checked;
             RestartSlideShow();
+            SaveSettings();
         }
 
         private void resetWindowPositionToolStripMenuItem_Click(object sender, EventArgs e)
@@ -1064,6 +1087,7 @@ namespace UniWinImageViewer
             m_isJumpDisabledForAnim = disableJumpForAnimationToolStripMenuItem.Checked;
 
             m_jumper.IsSuppressed = (m_isJumpDisabledForAnim && m_isAnimation);
+            SaveSettings();
         }
 
         #endregion
