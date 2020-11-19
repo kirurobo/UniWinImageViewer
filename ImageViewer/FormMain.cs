@@ -1,16 +1,10 @@
 ﻿using System;
 using System.Collections.Generic;
-using System.ComponentModel;
-using System.Data;
 using System.Diagnostics;
 using System.Drawing;
 using System.IO;
 using System.Linq;
 using System.Net;
-using System.Net.Http.Headers;
-using System.Runtime.InteropServices;
-using System.Text;
-using System.Threading.Tasks;
 using System.Windows.Forms;
 using static UniWinImageViewer.UniWinCSharp;
 
@@ -78,10 +72,8 @@ namespace UniWinImageViewer
         // リストの内何番目を表示するか
         int m_targetFileIndex = 0;
 
-        // 裏で読み込むため2枚ビットマップを用意
-        Bitmap[] m_bitmaps = new Bitmap[2];
-
-        int m_bitmapIndex = 0;
+        // 画像が入るビットマップ
+        Bitmap m_bitmap = null;
 
         /// <summary>
         /// これが0でなければ、画像サイズにこれを書けたサイズにウィンドウサイズを自動調整
@@ -126,7 +118,7 @@ namespace UniWinImageViewer
 
         Bitmap currentBitmap
         {
-            get { return m_bitmaps[m_bitmapIndex];  }
+            get { return m_bitmap;  }
         }
 
         /// <summary>
@@ -134,9 +126,6 @@ namespace UniWinImageViewer
         /// </summary>
         void Initialize()
         {
-            m_bitmaps[0] = null;
-            m_bitmaps[1] = null;
-
             // コンテキストメニュー文字列の修正
             InitializeContextMenuItems();
 
@@ -331,9 +320,6 @@ namespace UniWinImageViewer
             var path = m_targetFiles[m_targetFileIndex];
             //Debug.WriteLine("Loading " + path);
 
-            int backIndex = m_bitmapIndex > 0 ? 0 : 1;
-            int foreIndex = m_bitmapIndex;
-
             bool isUrl = false;
             if (path.StartsWith("https://") || path.StartsWith("http://"))
             {
@@ -350,11 +336,16 @@ namespace UniWinImageViewer
             {
                 if (isUrl)
                 {
-                    stream = m_webClient.OpenRead(path);
+                    stream  = m_webClient.OpenRead(path);
                     bitmap = new Bitmap(stream);
                 }
                 else
                 {
+                    //// アニメーションGIFでなければ、こちらの方がロックせずにすむ
+                    ////    だが、アニメーションさせようとするとエラーとなってしまう
+                    //stream = new FileStream(path, FileMode.Open, FileAccess.Read);
+                    //bitmap = new Bitmap(stream);
+
                     bitmap = new Bitmap(path);
                 }
 
@@ -385,17 +376,17 @@ namespace UniWinImageViewer
                 if (stream != null) stream.Close();
             }
 
-            m_bitmaps[backIndex] = bitmap;
-            m_bitmapIndex = backIndex;
+            // 前の画像リソースはクリア
+            if (m_bitmap != null)
+            {
+                m_bitmap.Dispose();
+                m_bitmap = null;
+            }
+
+            // 読み込んだビットマップを利用開始
+            m_bitmap = bitmap;
             
             pictureBoxMain.Image = currentBitmap;
-
-            // 前の画像リソースはクリア
-            if (m_bitmaps[foreIndex] != null)
-            {
-                m_bitmaps[foreIndex].Dispose();
-                m_bitmaps[foreIndex] = null;
-            }
 
             // ウィンドウサイズ調整
             FitWindowSize();
