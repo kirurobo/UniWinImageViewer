@@ -836,6 +836,8 @@ namespace UniWinImageViewer
             {
                 m_isDragging = false;
 
+                Invalidate();  // はみ出していた部分も描画されるよう、再描画
+
                 StartMotion();
             }
         }
@@ -1088,12 +1090,12 @@ namespace UniWinImageViewer
             SaveSettings();
         }
 
-        #endregion
-
         private void helpToolStripMenuItem_Click(object sender, EventArgs e)
         {
             var help = new AboutBoxHelp();
             help.ShowDialog(this);
         }
+
+        #endregion
     }
 }
