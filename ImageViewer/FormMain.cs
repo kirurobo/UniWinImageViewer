@@ -351,7 +351,7 @@ namespace UniWinImageViewer
 
                 if (ImageAnimator.CanAnimate(bitmap))
                 {
-                    ImageAnimator.Animate(bitmap, new EventHandler(ImageFrameChanged));
+                    //ImageAnimator.Animate(bitmap, new EventHandler(ImageFrameChanged));   // 不要？エラーが出る？
                     m_isAnimation = true;
                 }
             }
@@ -385,8 +385,9 @@ namespace UniWinImageViewer
 
             // 読み込んだビットマップを利用開始
             m_bitmap = bitmap;
-            
-            pictureBoxMain.Image = currentBitmap;
+
+            //pictureBoxMain.Image = currentBitmap;
+            pictureBoxMain.Image = m_bitmap;
 
             // ウィンドウサイズ調整
             FitWindowSize();
@@ -435,6 +436,9 @@ namespace UniWinImageViewer
 
             // 最大化されているときは調整なし
             if (m_uniwin.IsMaximized) return;
+
+            // 画像が読み込まれていなければ何もしない
+            if (currentBitmap == null) return;
 
             var formerSize = m_uniwin.GetWindowSize();
             var pos = m_uniwin.GetWindowPosition();
@@ -581,7 +585,7 @@ namespace UniWinImageViewer
         {
             bool through = false;
 
-            if (m_uniwin.IsTransparent && !m_isDragging)
+            if (m_uniwin.IsTransparent && !m_isDragging && (currentBitmap != null))
             {
                 Point curPos = Cursor.Position;
                 Point location = pictureBoxMain.PointToClient(curPos);
@@ -781,7 +785,7 @@ namespace UniWinImageViewer
 
         private void pictureBoxMain_Paint(object sender, PaintEventArgs e)
         {
-            ImageAnimator.UpdateFrames(currentBitmap);
+            if (currentBitmap != null) ImageAnimator.UpdateFrames(currentBitmap);
         }
 
         private void timerMain_Tick(object sender, EventArgs e)
