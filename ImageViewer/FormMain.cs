@@ -436,12 +436,19 @@ namespace UniWinImageViewer
             // 最大化されているときは調整なし
             if (m_uniwin.IsMaximized) return;
 
+            var formerSize = m_uniwin.GetWindowSize();
+            var pos = m_uniwin.GetWindowPosition();
+
             int width = (int)(currentBitmap.Width * m_fitScale);
             int height = (int)(currentBitmap.Height* m_fitScale);
+
+            // Windows向けに、ウィンドウサイズ変更後左上が固定となるよう位置調整
+            pos.y = pos.y + formerSize.y - height;
 
             //this.ClientSize = new Size(width, height);        // Formの機能でサイズ変更する場合
 
             m_uniwin.SetWindowSize(new UniWinCSharp.Vector2(width, height));
+            m_uniwin.SetWindowPosition(pos);
         }
 
         /// <summary>
